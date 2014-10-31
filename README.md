@@ -20,3 +20,25 @@ unstable and in early stages of development.
 
 This repository will contain the reference implementation of the format,
 including a general purpose library, and encoding/decoding utilities.
+
+The following subdirectories exist in this repository:
+- doc/ - file format specification and other documentation.
+- lib/ - libepai: general-purpose library.
+- enc/ - epaienc: CLI encoding utility.
+- dec/ - epaidec: CLI decoding utility.
+- poke/ - epaipoke: CLI util for poking low-level aspects of EPAI files,
+  to tweak, fix, and help with debugging.
+- chk/ - epaichk: CLI utility to check EPAI files for corruption/errors.
+- txt/ - epaitxt: CLI utility to produce plain text dumps of EPAI file
+  data, and recreate EPAI files based on the text representation; useful
+  for manually creating test cases.
+
+
+This project uses GNU Autotools. To build from git, clone and run:
+
+```
+$ autoreconf --install
+$ ./configure --prefix=/install/path/dir
+$ make install
+```
+
