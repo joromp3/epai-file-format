@@ -1,0 +1,241 @@
+# Extensible Package for Animated Images -- Specification
+
+(revision 0.1 *DRAFT*) *WORK IN PROGRESS*
+
+
+Author: Jasen Borisov
+Date: November 2014
+
+
+## Introduction
+
+Extensible Package for Animated Images (EPAI) is a file format intended
+primarily for games, graphics developers, and graphics software. It aims
+to allow for maximum flexibility in implementation and use; to provide a
+standard that can be adapted for a large variety of use cases common in
+games and graphics applications, especially on embedded systems.
+
+Important features of the format:
+- Multiple images can be packed into one file.
+- Each image can be optionally animated.
+ - Full control over keyframes, to support skips and loops.
+ - Control over frame properties such as duration, position, dimensions.
+- Flexibility with pixel data format.
+ - Mix of integer/float with varying sizes/precisions for each channel.
+ - Any combination of up to 16 channels per pixel, allowing each pixel
+   to carry information like alpha, depth, lighting/shading data, etc,
+   alongside RGB color.
+- Text metadata.
+- Reserved private use space, giving the ability to extend and adapt to
+  custom applications.
+
+
+## Format Overview
+
+The file is a tree of sections. Every part of the file (including the
+file signature) is defined as a section. Certain section types can
+contain other nested sections.
+
+
+### Note on Private Use
+
+It is part of the design goals for the format to allow it to be
+adaptable to fit domain-specific needs. Therefore, there are many parts
+of this specification which explicitly define values or fields reserved
+for private use.
+
+In general, files using such "private use" values are considered to be
+non-standard and likely unparsable by standard implementations. The
+exception to this are private use section types in the optional range,
+as implementations are free to ignore optional sections (see below). Any
+other minor exceptions may be noted within the specifications of the
+individual section types.
+
+
+### Section Types
+
+Every section begins with a type code, which is an 8-bit unsigned
+integer value.
+
+What follows after the first byte differs for each section type.
+
+Sections can be either mandatory or optional. This is indicated by the
+most significant bit of the section type code, as follows:
+
+- MSB 1 (range 0x80-0xFF) indicates a mandatory section.
+- MSB 0 (range 0x00-0x7F) indicates an optional section.
+
+Mandatory section types are essential to the file and must be parsed in
+order to display an adequate representation of the encoded information.
+
+Optional section types contain information which is not essential. An
+adequate minimal representation of the encoded information can be
+produced by a decoding implementation even if these section types are
+ignored.
+
+All optional sections must contain a 32-bit unsigned integer value
+immediately after the section type value, to indicate the length of the
+remainder of the section. This is to permit implementations to easily
+skip the section.
+
+Section types in the ranges 0x00-0x3F and 0x80-0xBF are reserved for use
+by the standard. Implementations must not define custom private use
+sections with type codes in those ranges.
+
+Section types in the ranges 0x40-0x7F and 0xC0-0xFF are reserved for
+private use, and may be used for any implementation-specific purpose.
+These values will never be used by the official standard.
+
+All mandatory sections in an input file must be parsed. All
+implementations must implement support for all mandatory section types
+defined in this document. Mandatory sections not defined in this
+document are allowed in files as long as their type code falls in the
+private use range. Implementations must refuse to parse input files
+containing mandatory sections from the private use range which they do
+not support, or files which contain mandatory sections which are neither
+defined in this document nor fall in the defined private use range.
+
+Implementations are not required to implement support for any optional
+section types, including ones defined in this document. Implementations
+are allowed to ignore optional sections in a file for any reason. When
+modifying existing files, implementations must remove any optional
+sections which they do not support.
+
+Certain section types may contain references to other sections defined
+before them, for various reasons. These references point to a specific
+section type, and take the form of the index of the section in the order
+of appearance in the file. Sections may only refer to other sections
+which appear before them in a file; references pointing to sections
+appearing later in the file stream are not allowed. This reference
+pointer system prevents duplicate data in a file.
+
+List of all section types:
+
+0x00		always ignored data
+0x01		text metadata
+0x02		compressed text
+0x03		frame
+0x04		gamma correction
+0x05		spritesheet data
+0x06-0x3F	(reserved for future standard use)
+0x40-0x7F	(reserved for private use)
+0x80		pixel format
+0x81		palette
+0x82		image
+0x83		keyframe
+0x84		file signature
+0x85-0xBF	(reserved for future standard use)
+0xC0-0xFF	(reserved for private use)
+
+
+## Standard Mandatory Sections
+
+Here follow the exact specifications for each mandatory section type
+defined by this standard.
+
+
+### Section 0x84: File Signature
+
+The file signature is logically considered the parent of all other
+sections. It must appear exactly once, at the very beginning of every
+file. It ends implicitly when the file ends.
+
+The file signature header has the following syntax:
+
+	Byte:	0	1	2	3
+	Hex:	0x84	0x45	0x50	0x41
+
+	Byte:	4	5	6	7
+	Hex:	0x49	0x0D	0x0A	0x0A
+
+	Byte:	8/9 (16-bit unsigned integer)
+	Hex:	0x2A00
+
+	Total length: 10 bytes.
+
+Byte 0 is the section type. It is non-ASCII and prevents the file from
+being misidentified as plain text.
+
+Bytes 1-4 spell out "EPAI" in ASCII, serving as a human-readable
+identification of the file format.
+
+Bytes 5-6 are a DOS CRLF line ending. They allow to check if the file
+has been corrupted by DOS->UNIX line ending conversion.
+
+Byte 7 is a UNIX LF line ending. It allows to check if the file has been
+corrupted by UNIX->DOS line ending conversion.
+
+Bytes 8-9 are a single 16-bit unsigned integer value which serves as an
+endian marker, to indicate endianness of any multi-bytes values that
+appear later in the file. The zero byte in the endian marker can be used
+to detect a type of file corruption where zero bytes are removed during
+transmission.
+
+The file must be encoded in either big or little endian; no other endian
+formats (such as PDP/mixed endian) are allowed.
+
+The implementation must do endian conversion for all multi-byte values
+in the file if the endian marker in the file signature indicates an
+endianness that does not match the one of the decoding machine.
+
+After the header specified above, immediately follow all other sections
+of the file. Logically, all other sections can be considered as
+contained within a global file signature section which ends at the end
+of the file.
+
+
+### Section 0x80: Pixel Format
+
+// TODO
+
+
+### Section 0x81: Palette
+
+// TODO
+
+
+### Section 0x82: Image
+
+// TODO
+
+
+### Section 0x83: Keyframe
+
+// TODO
+
+
+## Standard Optional Sections
+
+Here follow the exact specifications for each optional section type
+defined by this standard.
+
+
+### Section 0x00: Always Ignored Data
+
+// TODO
+
+
+### Section 0x01: Text Metadata
+
+// TODO
+
+
+### Section 0x02: Compressed Text
+
+// TODO
+
+
+### Section 0x03: Frame
+
+// TODO
+
+
+### Section 0x04: Gamma Correction Information
+
+// TODO
+
+
+### Section 0x05: Spritesheet Data
+
+// TODO
+
