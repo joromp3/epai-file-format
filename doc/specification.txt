@@ -111,13 +111,14 @@ pointer system prevents duplicate data in a file.
 
 List of all section types:
 
-0x00		always ignored data
-0x01		text metadata
-0x02		compressed text
-0x03		frame
-0x04		gamma correction
-0x05		spritesheet data
-0x06-0x3F	(reserved for future standard use)
+0x00		zero padding
+0x01		checksum
+0x02		text metadata
+0x03		compressed text
+0x04		frame
+0x05		gamma correction
+0x06		spritesheet data
+0x07-0x3F	(reserved for future standard use)
 0x40-0x7F	(reserved for private use)
 0x80		pixel format
 0x81		palette
@@ -186,12 +187,148 @@ of the file.
 
 ### Section 0x80: Pixel Format
 
-// TODO
+A section of this type is used to define a pixel format to be used for
+encoding pixel data in other sections later in the file.
+
+At least one pixel format section must be present in every file. The
+maximum number of pixel format sections in one file is 256.
+
+This section type cannot be contained in any section other than 0x84
+(File Signature). This section type cannot contain any child sections.
+
+Pixel format sections have the following syntax:
+
+	Size	Value
+	1 byte	0x80
+	1 byte	number of channels
+	1 byte	channel #0
+	...	... more channels ...
+
+Byte 0 is the section type code.
+
+Byte 1 is the number of channels in the pixel format. The maximum number
+of channels in a pixel format is 16, as there are only 16 channel type
+values. More on that below.
+
+After that follow the channel format definitions, one byte each. They
+are encoded as follows:
+
+	0123 4567	(most significant bit is labeled 0)
+	^--- ^---
+	DT   CT
+
+The channel format definitions are composed of two values, 4 bits each,
+a Data Type and a Channel Type.
+
+The data type value indicates the binary format for the channel data. It
+can have one of the following values:
+
+	Value	Meaning
+	0000	1-bit unsigned integer
+	0001	2-bit unsigned integer
+	0010	4-bit unsigned integer
+	0011	8-bit unsigned integer
+	0100	16-bit unsigned integer
+	0101	24-bit unsigned integer
+	0110	32-bit unsigned integer
+	0111	private use
+	1000	16-bit half float
+	1001	32-bit single float
+	1010	64-bit double float
+	1011	reserved for future standard use
+	1100	reserved for future standard use
+	1101	private use
+	1110	private use
+	1111	private use
+
+The channel type value indicates the intended meaning of the information
+encoded in the channel. It can have one of the following values:
+
+	Value	Meaning
+	0000	gray / color index / private use ; see below
+	0001	red
+	0010	green
+	0011	blue
+	0100	alpha
+	0101	depth
+	0110	mask / stencil
+	0111	private use
+	1000	? x coordinate / normal
+	1001	? y coordinate / normal
+	1010	? z coordinate / normal
+	1011	? heightmap
+	1100	? diffuse
+	1101	? specularity
+	1110	private use
+	1111	private use
+
+0000 is a special multi-purpose value. If none of the RGB channel types
+exist in the same pixel format section, it is interpreted as either
+grayscale or color index, depending on whether or not there exists a
+palette section elsewhere in the file which is associated with the pixel
+format section (see the palette section specification). If any of the
+RGB channels are defined, 0000 becomes a private use value.
+
+There are three (or four if counting 0000) private use values available
+to implementations for custom needs. The meanings for channel types
+>=1000 (marked with '?' above) are only suggested (as those are
+relatively common for graphics in games). If the standard three private
+use values are insufficient for the needs of an implementation, the
+values marked with '?' above may also be used for private use. The '?'
+above indicates that those meanings are to be treated as a convention as
+opposed to a requirement.
+
+More than one channel definition with the same 4-bit channel type value
+is not allowed within the same pixel format section.
+
+Note that none of the above channel types are required in a pixel
+format. Every pixel format must contain at least one channel, but it can
+be of any type. A pixel format with no color channels is perfectly
+valid, for example.
 
 
 ### Section 0x81: Palette
 
-// TODO
+A section of this type defines a palette to be used with pixel formats
+which contain a color-index channel to be used as color information.
+
+This section cannot contain other sections, and can only appear globally
+as a child of 0x84 (File Signature).
+
+Palette sections have the following syntax:
+
+	Size	Value
+	1 byte	0x81
+	1 byte	number of associated pixel formats
+	1 byte	reference to pixel format section
+	...	... more references ...
+	1 byte	number of colors
+	3 bytes	color encoded in 24-bit (8 bpc) RGB
+	...	... more colors ...
+
+Byte 0 is the section type code.
+
+Byte 1 is the number of pixel format sections which use this section as
+their palette data. This number can be zero, which, while likely to be
+useless practically (resulting in an extraneous palette section), is
+considered valid.
+
+After that follow references to all the pixel format sections which use
+this section as their palette data. All of these associated pixel
+formats must contain a channel of type 0000 and no channels with types
+in the range 0001-0011 (RGB). The 0000 channel can only have a data type
+in the range 0000-0011 (unsigned integer with maximum 8 bits size).
+
+After that follows an 8-bit unsigned integer which represents the number
+of colors in the palette minus one. Therefore, the maximum number of
+colors a palette can contain in 256 and the minimum is one. However, the
+number of colors in the palette is completely independent from the size
+of the color index channel in the associated pixel formats. Extra colors
+are simply ignored, and missing colors must be interpreted as black.
+
+After that follow the definitions of all the colors in the palette, each
+taking 1 byte for red, 1 byte for green, and 1 byte for blue, in that
+order.
 
 
 ### Section 0x82: Image
@@ -210,32 +347,37 @@ Here follow the exact specifications for each optional section type
 defined by this standard.
 
 
-### Section 0x00: Always Ignored Data
+### Section 0x00: Zero Padding
 
 // TODO
 
 
-### Section 0x01: Text Metadata
+### Section 0x01: Checksums
 
 // TODO
 
 
-### Section 0x02: Compressed Text
+### Section 0x02: Text Metadata
 
 // TODO
 
 
-### Section 0x03: Frame
+### Section 0x03: Compressed Text
 
 // TODO
 
 
-### Section 0x04: Gamma Correction Information
+### Section 0x04: Frame
 
 // TODO
 
 
-### Section 0x05: Spritesheet Data
+### Section 0x05: Gamma Correction Information
+
+// TODO
+
+
+### Section 0x06: Spritesheet Data
 
 // TODO
 
