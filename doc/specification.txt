@@ -1,6 +1,6 @@
 # Extensible Package for Animated Images -- Specification
 
-(revision 0.1 *DRAFT*) *WORK IN PROGRESS*
+(revision 0.1 (version code 0x00) *DRAFT*) *WORK IN PROGRESS*
 
 
 Author: Jasen Borisov
@@ -149,10 +149,10 @@ The file signature header has the following syntax:
 	Byte:	4	5	6	7
 	Hex:	0x49	0x0D	0x0A	0x0A
 
-	Byte:	8/9 (16-bit unsigned integer)
-	Hex:	0x2A00
+	Byte:	8	8/9 (16-bit unsigned integer)
+	Hex:	0x00	0xAF00
 
-	Total length: 10 bytes.
+	Total length: 11 bytes.
 
 Byte 0 is the section type. It is non-ASCII and prevents the file from
 being misidentified as plain text.
@@ -166,7 +166,9 @@ has been corrupted by DOS->UNIX line ending conversion.
 Byte 7 is a UNIX LF line ending. It allows to check if the file has been
 corrupted by UNIX->DOS line ending conversion.
 
-Bytes 8-9 are a single 16-bit unsigned integer value which serves as an
+Byte 8 is the version of the format specification that the file follows.
+
+Bytes 9-10 are a single 16-bit unsigned integer value which serves as an
 endian marker, to indicate endianness of any multi-bytes values that
 appear later in the file. The zero byte in the endian marker can be used
 to detect a type of file corruption where zero bytes are removed during
@@ -224,19 +226,19 @@ The data type value indicates the binary format for the channel data. It
 can have one of the following values:
 
 	Value	Meaning
-	0000	1-bit unsigned integer
-	0001	2-bit unsigned integer
-	0010	4-bit unsigned integer
-	0011	8-bit unsigned integer
-	0100	16-bit unsigned integer
-	0101	24-bit unsigned integer
-	0110	32-bit unsigned integer
+	0000	4-bit unsigned integer
+	0001	8-bit unsigned integer
+	0010	16-bit unsigned integer
+	0011	24-bit unsigned integer
+	0100	32-bit unsigned integer
+	0101	reserved for future standard use
+	0110	private use
 	0111	private use
 	1000	16-bit half float
 	1001	32-bit single float
 	1010	64-bit double float
 	1011	reserved for future standard use
-	1100	reserved for future standard use
+	1100	private use
 	1101	private use
 	1110	private use
 	1111	private use
@@ -317,14 +319,15 @@ After that follow references to all the pixel format sections which use
 this section as their palette data. All of these associated pixel
 formats must contain a channel of type 0000 and no channels with types
 in the range 0001-0011 (RGB). The 0000 channel can only have a data type
-in the range 0000-0011 (unsigned integer with maximum 8 bits size).
+in the range 0000-0001 (unsigned integer with either 4 or 8 bits size).
 
 After that follows an 8-bit unsigned integer which represents the number
 of colors in the palette minus one. Therefore, the maximum number of
 colors a palette can contain in 256 and the minimum is one. However, the
 number of colors in the palette is completely independent from the size
 of the color index channel in the associated pixel formats. Extra colors
-are simply ignored, and missing colors must be interpreted as black.
+are simply ignored, and missing colors must be interpreted as fully
+transparent.
 
 After that follow the definitions of all the colors in the palette, each
 taking 1 byte for red, 1 byte for green, and 1 byte for blue, in that
@@ -349,7 +352,31 @@ defined by this standard.
 
 ### Section 0x00: Zero Padding
 
-// TODO
+This section type allows padding to be added to files if they need to be
+of a certain size.
+
+This is the only way to add padding legally; anything else will likely
+confuse decoding implementations (as any value outside of a section is
+considered the beginning of a new section). The minimum number of bytes
+of padding that can be inserted into a file is 5, as this considered an
+"optional section" and therefore needs 1 byte for type code and 4 bytes
+for length.
+
+The syntax of the zero padding section is as follows:
+
+	Size	Value
+	1 byte	0x00
+	4 bytes	length of remainder of section
+	n bytes	... zeroes ...
+
+Byte 0 is the section type code. The next 4 bytes are the standard
+section length that must be present for all optional sections; in this
+case, the number of zeroes following after it.
+
+The remainder of the section must be filled with zeroes. Any other value
+is considered invalid. It is recommended that implementations check the
+contents of zero padding sections to ensure that they are actually
+filled with zeroes.
 
 
 ### Section 0x01: Checksums
@@ -380,4 +407,42 @@ defined by this standard.
 ### Section 0x06: Spritesheet Data
 
 // TODO
+
+
+## Rationale and Remarks on Design
+
+Some explanations, personal remarks, and notes about the various design
+decisions which had to be made while designing the EPAI format, such as
+exactly why certain features were added/omitted from the specification.
+
+
+### Design Goals
+
+The intended use of this file format is in 2D and 3D games and graphics
+development. The format is designed with the following goals in mind:
+
+1. Define a standard for functionality which is commonly needed by the
+   target audience of the format.
+2. Ease of extensibility and adaptability to custom needs.
+3. Ease of implementation and simplicity.
+4. Optimizeable for embedded and low-spec systems.
+
+The PNG file format was a major inspiration for a lot of the design
+aspects of EPAI.
+
+
+### Endianness
+
+Both big and little endian encodings are supported to allow the data to
+be matched and optimized for decoding on a variety of systems.
+
+Mixed endian encodings are not supported, because they would increase
+the complexity unnecessarily and make implementation harder. Very few
+modern machine architectures use mixed endian anyway.
+
+
+### Data Formats for Channels
+
+// TODO explain choice of integer and float formats.
+
 
