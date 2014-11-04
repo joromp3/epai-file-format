@@ -386,7 +386,79 @@ filled with zeroes.
 
 ### Section 0x02: Text Metadata
 
-// TODO
+This section type allows text metadata to be stored. The text in
+sections of this type is uncompressed, and therefore, this section type
+should only be used for short pieces of textual metadata. If long
+amounts of text need to be stored in the file, section type 0x03
+(Compressed Text) should be used instead.
+
+The data in this section is organized in key-value pairs. The
+specification defines some conventions for common metadata keys.
+However, this being an optional section, implementations are free to
+parse only the ones they need (or none at all). None of the standard
+keys defined below are required to be present in a text metadata
+section, and implementations are allowed to add extra keys of their own.
+
+This section type cannot contain other sections. Text metadata sections
+may only appear inside sections of type 0x84 (File Signature) and 0x82
+(Image). There can be only one global text metadata section. Only one
+text metadata section per image is allowed. The global text metadata
+section is interpreted to contain metadata about the entire archive.
+Text metadata sections which appear inside images are interpreted to
+contain metadata about the individual images themselves.
+
+Text metadata sections have the following syntax:
+
+	Size	Value
+	1 byte	0x02
+	4 bytes	length of remainder of section
+	1 byte	number of key-value pairs
+	n bytes	null-terminated UTF-8 string (key)
+	n bytes	null-terminated UTF-8 string (value)
+	...	... more key-value pairs ...
+
+Byte 0 is the section type code.
+
+Bytes 1-4 form the standard optional section length.
+
+Byte 5 is the number of key-value pairs that the section contains.
+
+Then follow all of the key-value pairs as null-terminated UTF-8 strings.
+
+Duplicate keys are not allowed. Empty strings for keys are not allowed.
+Empty strings for values are legal but not recommended.
+
+A list of standard keys is defined, which should be used for common
+metadata information when possible. They are:
+
+Standard keys for the global text metadata section:
+- "Title": short (one-line) description of the whole archive.
+- "Description": possibly longer description of the whole archive.
+- "Encoder": the name of the software used to encode the file.
+- "Version": the version of the whole image package.
+- "Comment": miscellaneous comment.
+
+Standard keys for per-image text metadata sections:
+- "Title" = short (one-line) description of the specific image.
+- "Description" = possibly longer description of the specific image.
+- "Author" = the name of the image's creator.
+- "Software" = the software used to create the content (not encoder!).
+- "Copyright": copyright notice.
+- "ContentVersion": revision/version number for the image content.
+- "Comment" = miscellaneous comment.
+
+The per-image "Author", "Software", and "Copyright" fields can be
+specified globally in the global text metadata section, in which case
+their values will be interpreted as applying to all images in the
+archive which do not specify their own values. This allows to avoid
+repetition in an archive in which most or all images would otherwise
+have the same values for these fields.
+
+It must be noted that the per-image "Software" field is intended for the
+application that the image's creator used to create the content of the
+image, which is often different from the software that was used to
+encode the file. The global "Encoder" field should be used for the
+software that was used to encode the actual file.
 
 
 ### Section 0x03: Compressed Text
