@@ -120,11 +120,11 @@ List of all section types:
 0x06		spritesheet data
 0x07-0x3F	(reserved for future standard use)
 0x40-0x7F	(reserved for private use)
-0x80		pixel format
-0x81		palette
-0x82		image
-0x83		keyframe
-0x84		file signature
+0x80		file signature
+0x81		pixel format
+0x82		palette
+0x83		image
+0x84		keyframe
 0x85-0xBF	(reserved for future standard use)
 0xC0-0xFF	(reserved for private use)
 
@@ -135,7 +135,7 @@ Here follow the exact specifications for each mandatory section type
 defined by this standard.
 
 
-### Section 0x84: File Signature
+### Section 0x80: File Signature
 
 The file signature is logically considered the parent of all other
 sections. It must appear exactly once, at the very beginning of every
@@ -144,7 +144,7 @@ file. It ends implicitly when the file ends.
 The file signature header has the following syntax:
 
 	Byte:	0	1	2	3
-	Hex:	0x84	0x45	0x50	0x41
+	Hex:	0x80	0x45	0x50	0x41
 
 	Byte:	4	5	6	7
 	Hex:	0x49	0x0D	0x0A	0x0A
@@ -187,7 +187,7 @@ contained within a global file signature section which ends at the end
 of the file.
 
 
-### Section 0x80: Pixel Format
+### Section 0x81: Pixel Format
 
 A section of this type is used to define a pixel format to be used for
 encoding pixel data in other sections later in the file.
@@ -195,13 +195,13 @@ encoding pixel data in other sections later in the file.
 At least one pixel format section must be present in every file. The
 maximum number of pixel format sections in one file is 256.
 
-This section type cannot be contained in any section other than 0x84
+This section type cannot be contained in any section other than 0x80
 (File Signature). This section type cannot contain any child sections.
 
 Pixel format sections have the following syntax:
 
 	Size	Value
-	1 byte	0x80
+	1 byte	0x81
 	1 byte	number of channels
 	1 byte	channel #0
 	...	... more channels ...
@@ -289,18 +289,18 @@ be of any type. A pixel format with no color channels is perfectly
 valid, for example.
 
 
-### Section 0x81: Palette
+### Section 0x82: Palette
 
 A section of this type defines a palette to be used with pixel formats
 which contain a color-index channel to be used as color information.
 
 This section cannot contain other sections, and can only appear globally
-as a child of 0x84 (File Signature).
+as a child of 0x80 (File Signature).
 
 Palette sections have the following syntax:
 
 	Size	Value
-	1 byte	0x81
+	1 byte	0x82
 	1 byte	number of associated pixel formats
 	1 byte	reference to pixel format section
 	...	... more references ...
@@ -334,12 +334,12 @@ taking 1 byte for red, 1 byte for green, and 1 byte for blue, in that
 order.
 
 
-### Section 0x82: Image
+### Section 0x83: Image
 
 // TODO
 
 
-### Section 0x83: Keyframe
+### Section 0x84: Keyframe
 
 // TODO
 
@@ -362,7 +362,7 @@ of padding that can be inserted into a file is 5, as this considered an
 "optional section" and therefore needs 1 byte for type code and 4 bytes
 for length.
 
-The syntax of the zero padding section is as follows:
+Zero padding sections have the following syntax:
 
 	Size	Value
 	1 byte	0x00
@@ -454,7 +454,7 @@ keys defined below are required to be present in a text metadata
 section, and implementations are allowed to add extra keys of their own.
 
 This section type cannot contain other sections. Text metadata sections
-may only appear inside sections of type 0x84 (File Signature) and 0x82
+may only appear inside sections of type 0x80 (File Signature) and 0x83
 (Image). There can be only one global text metadata section. Only one
 text metadata section per image is allowed. The global text metadata
 section is interpreted to contain metadata about the entire archive.
