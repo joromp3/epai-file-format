@@ -466,18 +466,17 @@ Text metadata sections have the following syntax:
 	Size	Value
 	1 byte	0x02
 	4 bytes	length of remainder of section
-	1 byte	number of key-value pairs
-	n bytes	null-terminated UTF-8 string (key)
-	n bytes	null-terminated UTF-8 string (value)
+	n bytes	null-terminated string (key)
+	m bytes	null-terminated UTF-8 string (value)
 	...	... more key-value pairs ...
 
 Byte 0 is the section type code.
 
 Bytes 1-4 form the standard optional section length.
 
-Byte 5 is the number of key-value pairs that the section contains.
-
-Then follow all of the key-value pairs as null-terminated UTF-8 strings.
+Then follow all of the key-value pairs as null-terminated strings. Keys
+can only contain characters A-Z,a-z (letters), and are case-insensitive.
+Values are UTF-8 encoded strings and can contain any Unicode character.
 
 Duplicate keys are not allowed. Empty strings for keys are not allowed.
 Empty strings for values are legal but not recommended.
