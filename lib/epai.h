@@ -5,6 +5,7 @@
 #ifndef LIBEPAI_EPAI_H
 #define LIBEPAI_EPAI_H
 
+#include "types.h"
 
 
 #endif /* LIBEPAI_EPAI_H */
