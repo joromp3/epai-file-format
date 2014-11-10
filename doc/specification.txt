@@ -379,9 +379,63 @@ contents of zero padding sections to ensure that they are actually
 filled with zeroes.
 
 
-### Section 0x01: Checksums
+### Section 0x01: Section Checksums
 
-// TODO
+This section type allows checksums to be included in a file, to ensure
+data correctness.
+
+This section can only appear globally as a child of section type 0x80
+(File Signature). It can appear at most once per file. It cannot contain
+any other sections.
+
+This section contains checksums for individual other sections
+in the file. It can contain multiple checksums for the same section.
+Sections are checksummed selectively; there is no restriction on how
+many sections this section contains checksums for. The only section
+types that checksums are allowed for are 0x03 (Compressed Text) and 0x83
+(Image).
+
+The checksums section has the following syntax:
+
+	Size	Value
+	1 byte	0x01
+	4 bytes	length of remainder of section
+	- 1 byte	referenced section type
+	- 1 byte	referenced section index
+	- n bytes	null terminated string indicating checksum type
+	- 1 byte	length of checksum
+	- m bytes	checksum as null-terminated hex string
+	...	... more checksum records ...
+
+Byte 0 is the section type code.
+
+Bytes 1-4 are the standard optional section length.
+
+After that follow the checksum records. Every checksum record is
+composed of multiple values (all the values that begin with a dash above
+are part of each record).
+
+The first byte in each record is the type code of the section that the
+checksum is for. The second byte is the index/reference to the section
+that the checksum is for.
+
+The next part of the record is a null-terminated string indicating the
+checksum type/algorithm. It can only contain characters A-Z,0-9.
+Examples: "MD5", "SHA256", "CRC32".
+
+It is recommended that implementations support at least the MD5
+algorithm and the SHA family of algorithms. Implementations should
+quietly ignore checksums that they do not support.
+
+After the type string follows 1 byte indicating the length of the
+checksum string.
+
+Then follows the checksum, as a null-terminated ASCII hexadecimal
+string.
+
+For compressed text sections, checksum the entire section including type
+code and length. For images, prepend the pixel format the image uses to
+the image section, both complete with section type, etc.
 
 
 ### Section 0x02: Text Metadata
