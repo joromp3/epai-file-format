@@ -8,6 +8,7 @@
 #include "types.h"
 
 #include "file_signature.h"
+#include "padding.h"
 
 
 #endif /* LIBEPAI_EPAI_H */

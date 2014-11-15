@@ -7,7 +7,7 @@
 
 typedef enum {
 	/* No error. */
-	EPAI_SUCCESS,
+	EPAI_SUCCESS = 0,
 	/* Undefined error (!EPAI_SUCCESS). */
 	EPAI_ERROR_UNSPECIFIED,
 	/* Bad section type code. */
@@ -17,7 +17,9 @@ typedef enum {
 	/* Corrupt file signature. */
 	EPAI_ERROR_BAD_FILE_SIGNATURE,
 	/* Unsupported format version. */
-	EPAI_ERROR_VERSION_UNSUPPORTED
+	EPAI_ERROR_VERSION_UNSUPPORTED,
+	/* Bad (nonzero) padding. */
+	EPAI_ERROR_NONZERO_PADDING
 } epai_error_t;
 
 typedef enum {
