@@ -32,8 +32,7 @@ extern epai_error_t epai_validate_file_signature(const char* buffer,
 
 	if (*++buffer != 'E' || *++buffer != 'P' ||
 	    *++buffer != 'A' || *++buffer != 'I' ||
-	    *++buffer != 0x49 || *++buffer != 0x0d ||
-	    *++buffer != 0x0a || *++buffer != 0x0a) {
+	    *++buffer != 0x0d || *++buffer != 0x0a || *++buffer != 0x0a) {
 		return EPAI_ERROR_BAD_FILE_SIGNATURE;
 	}
 
@@ -44,6 +43,7 @@ extern epai_error_t epai_validate_file_signature(const char* buffer,
 	endian_marker = *++buffer;
 	endian_marker |= *++buffer << 8;
 
+	/* Validation should pass regardless of file endian. */
 	if (!(endian_marker == 0xAF00 || endian_marker == 0x00AF)) {
 		return EPAI_ERROR_BAD_FILE_SIGNATURE;
 	}
