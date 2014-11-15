@@ -10,6 +10,7 @@
 #include "generic_section.h"
 #include "file_signature.h"
 #include "padding.h"
+#include "metadata.h"
 
 
 #endif /* LIBEPAI_EPAI_H */

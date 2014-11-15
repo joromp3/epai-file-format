@@ -10,7 +10,6 @@ AM_PROG_AR
 LT_INIT
 AC_PROG_CC
 
-# Check for integer type headers.
 AC_CHECK_HEADER([endian.h], [have_endian_h=y])
 if test ! -n have_endian_h; then
   AC_MSG_ERROR([endian.h not found!])

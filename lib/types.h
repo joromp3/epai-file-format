@@ -19,7 +19,9 @@ typedef enum {
 	/* Unsupported format version. */
 	EPAI_ERROR_VERSION_UNSUPPORTED,
 	/* Bad (nonzero) padding. */
-	EPAI_ERROR_NONZERO_PADDING
+	EPAI_ERROR_NONZERO_PADDING,
+	/* Invalid metadata key string. */
+	EPAI_ERROR_METADATA_KEY
 } epai_error_t;
 
 typedef enum {
