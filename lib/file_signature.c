@@ -18,7 +18,8 @@ static const int file_signature_header_len = 11;
 static int max_format_version = 0x00;
 
 
-extern epai_error_t epai_validate_file_signature(const char* buffer, int len) {
+extern epai_error_t epai_validate_file_signature(const char* buffer,
+						 uint32_t len) {
 	unsigned int endian_marker;
 
 	if (len != file_signature_header_len) {

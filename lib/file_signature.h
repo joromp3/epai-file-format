@@ -12,7 +12,7 @@
     \param len Length of file signature header (must be 11).
     \return EPAI_SUCCESS if valid, or the error if not.
 */
-extern epai_error_t epai_validate_file_signature(const char*, int);
+extern epai_error_t epai_validate_file_signature(const char*, uint32_t);
 
 
 #endif /* LIBEPAI_FILE_SIGNATURE_H */
