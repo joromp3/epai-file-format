@@ -4,6 +4,8 @@ AC_CONFIG_MACRO_DIR([m4])
 AM_INIT_AUTOMAKE([foreign -Wall])
 AC_CONFIG_HEADER([config.h])
 
+AC_SUBST([includedir], [${includedir}/${PACKAGE}])
+
 AM_PROG_AR
 LT_INIT
 AC_PROG_CC
