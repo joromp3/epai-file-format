@@ -169,7 +169,7 @@ corrupted by UNIX->DOS line ending conversion.
 Byte 8 is the version of the format specification that the file follows.
 
 Bytes 9-10 are a single 16-bit unsigned integer value which serves as an
-endian marker, to indicate endianness of any multi-bytes values that
+endian marker, to indicate endianness of any multi-byte values that
 appear later in the file. The zero byte in the endian marker can be used
 to detect a type of file corruption where zero bytes are removed during
 transmission.
@@ -480,6 +480,8 @@ Values are UTF-8 encoded strings and can contain any Unicode character.
 
 Duplicate keys are not allowed. Empty strings for keys are not allowed.
 Empty strings for values are legal but not recommended.
+
+A text metadata section may contain a maximum of 256 key-value pairs.
 
 A list of standard keys is defined, which should be used for common
 metadata information when possible. They are:
