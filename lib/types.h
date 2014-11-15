@@ -23,6 +23,12 @@ typedef enum {
 } epai_error_t;
 
 typedef enum {
+	EPAI_ENDIAN_NATIVE,
+	EPAI_ENDIAN_LITTLE,
+	EPAI_ENDIAN_BIG
+} epai_endian_t;
+
+typedef enum {
 	/* Standard optional sections. */
 	EPAI_SECTION_PADDING = 0x00,
 	EPAI_SECTION_CHECKSUM = 0x01,
