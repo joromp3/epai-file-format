@@ -7,8 +7,7 @@
 
 
 #include "common.h"
-#include "types.h"
-#include "file_signature.h"
+#include "epai.h"
 
 
 /* According to spec, all file signatures must be of exactly this length. */
