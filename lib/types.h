@@ -48,26 +48,5 @@ typedef enum {
 } epai_section_type_t;
 
 
-/* Internal structs for section types. */
-
-typedef struct {
-	epai_section_type_t type;
-	uint32_t length;
-} epai_padding_section_t;
-
-typedef struct {
-        epai_section_type_t type;
-	int num_keys;
-	char* keys;
-	char* values;
-} epai_metadata_section_t;
-
-typedef union {
-	epai_section_type_t type;
-	epai_padding_section_t padding;
-	epai_metadata_section_t metadata;
-} epai_section_t;
-
-
 #endif /* LIBEPAI_TYPES_H */
 

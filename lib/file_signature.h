@@ -6,6 +6,11 @@
 #define LIBEPAI_FILE_SIGNATURE_H
 
 
+typedef struct {
+	epai_section_type_t type;
+} epai_file_signature_section_t;
+
+
 /** \fn epai_error_t epai_validate_file_signature_blob(const char* hdr, int len)
     \brief Validate a file signature header in memory.
     \param hdr Pointer to file signature header.

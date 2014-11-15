@@ -6,6 +6,12 @@
 #define LIBEPAI_PADDING_H
 
 
+typedef struct {
+	epai_section_type_t type;
+	uint32_t length;
+} epai_padding_section_t;
+
+
 /** \fn epai_error_t epai_validate_padding_blob(const char* buffer, uint32_t len)
     \brief Validate a file padding section in memory.
     \param buffer Pointer to padding section.

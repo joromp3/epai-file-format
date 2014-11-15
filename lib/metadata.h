@@ -6,6 +6,16 @@
 #define LIBEPAI_METADATA_H
 
 
+#define EPAI_METADATA_MAX_KEYS 256
+
+
+typedef struct {
+        epai_section_type_t type;
+	char* keys;
+	char* values;
+} epai_metadata_section_t;
+
+
 /** \fn epai_error_t epai_validate_metadata_blob(const char* buf, uint32_t len)
     \brief Validate a text metadata section in memory.
     \param buf Pointer to text metadata section.
