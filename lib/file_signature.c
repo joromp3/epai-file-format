@@ -51,3 +51,35 @@ extern epai_error_t epai_validate_file_signature(const char* buffer,
 	return EPAI_SUCCESS;
 }
 
+extern epai_error_t epai_fill_file_signature(char* buffer, uint32_t len) {
+	if (len != file_signature_header_len) {
+		return EPAI_ERROR_SECTION_LENGTH;
+	}
+
+	*buffer = EPAI_SECTION_FILE_SIGNATURE;
+	*++buffer = 'E';
+	*++buffer = 'P';
+	*++buffer = 'A';
+	*++buffer = 'I';
+	*++buffer = 0x0D;
+	*++buffer = 0x0A;
+	*++buffer = 0x0A;
+	*++buffer = 0x00; /* TODO: get a version value from global state. */
+	/* FIXME: detect and set the correct endian marker. */
+	*++buffer = 0x00;
+	*++buffer = 0xAF;
+
+	return EPAI_SUCCESS;
+}
+
+extern char* epai_new_file_signature() {
+	char* r = malloc(file_signature_header_len);
+
+	if (r != NULL) {
+		if (epai_fill_file_signature(r, file_signature_header_len)) {
+			free(r);
+		}
+	}
+
+	return r;
+}
