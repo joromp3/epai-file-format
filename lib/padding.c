@@ -1,8 +1,8 @@
 /* See LICENSE file for copyright and license terms. */
 
 /*
- * file_signature.c: implementation of functions related to the zero
- * padding section in the EPAI format.
+ * padding.c: implementation of functions related to the zero padding
+ * section in the EPAI format.
  */
 
 
