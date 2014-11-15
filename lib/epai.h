@@ -7,6 +7,7 @@
 
 #include "types.h"
 
+#include "generic_section.h"
 #include "file_signature.h"
 #include "padding.h"
 

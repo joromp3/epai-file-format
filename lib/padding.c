@@ -12,22 +12,16 @@
 
 extern epai_error_t epai_validate_padding_blob(const char* buffer,
 					       uint32_t len) {
-	uint32_t inner_len;
 	int i;
 
-	if (len < 5) {
-		return EPAI_ERROR_SECTION_LENGTH;
+	epai_error_t error = epai_validate_optional_section_blob(buffer, len);
+
+	if (error) {
+		return error;
 	}
 
 	if (*buffer != EPAI_SECTION_PADDING) {
 		return EPAI_ERROR_SECTION_TYPE;
-	}
-
-	/* FIXME: handle endian properly. */
-	inner_len = *(uint32_t*)(buffer + 1);
-
-	if (len != inner_len + 5) {
-		return EPAI_ERROR_SECTION_LENGTH;
 	}
 
 	for (i = 5; i < len; ++i) {
