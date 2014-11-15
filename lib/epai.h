@@ -7,6 +7,8 @@
 
 #include "types.h"
 
+#include "file_signature.h"
+
 
 #endif /* LIBEPAI_EPAI_H */
 
