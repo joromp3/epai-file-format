@@ -22,7 +22,7 @@ extern epai_error_t epai_validate_file_signature(const char* buffer, int len) {
 	unsigned int endian_marker;
 
 	if (len != file_signature_header_len) {
-		return EPAI_ERROR_BAD_FILE_SIGNATURE;
+		return EPAI_ERROR_SECTION_LENGTH;
 	}
 
 	if (*buffer != EPAI_SECTION_FILE_SIGNATURE) {

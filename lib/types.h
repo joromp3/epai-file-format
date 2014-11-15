@@ -12,6 +12,8 @@ typedef enum {
 	EPAI_ERROR_UNSPECIFIED,
 	/* Bad section type code. */
 	EPAI_ERROR_SECTION_TYPE,
+	/* Bad section length. */
+	EPAI_ERROR_SECTION_LENGTH,
 	/* Corrupt file signature. */
 	EPAI_ERROR_BAD_FILE_SIGNATURE,
 	/* Unsupported format version. */
