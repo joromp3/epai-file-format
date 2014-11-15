@@ -10,7 +10,8 @@
 #include "epai.h"
 
 
-extern epai_error_t epai_validate_padding(const char* buffer, uint32_t len) {
+extern epai_error_t epai_validate_padding_blob(const char* buffer,
+					       uint32_t len) {
 	uint32_t inner_len;
 	int i;
 
@@ -38,7 +39,7 @@ extern epai_error_t epai_validate_padding(const char* buffer, uint32_t len) {
 	return EPAI_SUCCESS;
 }
 
-extern epai_error_t epai_fill_padding(char* buffer, uint32_t len) {
+extern epai_error_t epai_fill_padding_blob(char* buffer, uint32_t len) {
 	int i;
 
 	if (len < 5) {
@@ -56,11 +57,11 @@ extern epai_error_t epai_fill_padding(char* buffer, uint32_t len) {
 	return EPAI_SUCCESS;
 }
 
-extern char* epai_new_padding(uint32_t len) {
+extern char* epai_new_padding_blob(uint32_t len) {
 	char* r = malloc(len);
 
 	if (r != NULL) {
-		if (epai_fill_padding(r, len)) {
+		if (epai_fill_padding_blob(r, len)) {
 			free(r);
 		}
 	}
