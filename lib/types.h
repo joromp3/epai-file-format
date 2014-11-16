@@ -10,6 +10,8 @@ typedef enum {
 	EPAI_SUCCESS = 0,
 	/* Undefined error (!EPAI_SUCCESS). */
 	EPAI_ERROR_UNSPECIFIED,
+	/* Out of memory. */
+	EPAI_ERROR_MALLOC,
 	/* Bad section type code. */
 	EPAI_ERROR_SECTION_TYPE,
 	/* Bad section length. */

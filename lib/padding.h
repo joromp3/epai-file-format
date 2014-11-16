@@ -21,12 +21,16 @@ typedef struct {
 extern epai_error_t epai_validate_padding_blob(const char*, uint32_t);
 
 
-/** \fn char* epai_new_padding_blob(epai_padding_section_t* ssp)
+/** \fn epai_error_t epai_new_padding_blob(const epai_padding_section_t* ssp,
+                                           char** out, uint32_t* len)
     \brief Allocate new memory and generate a new padding section binary in it.
     \param ssp Pointer to the section struct.
-    \return Pointer to the new padding section, or NULL on failure.
+    \param out On success, will be set to a pointer to the new memory.
+    \param len On success, will be set to the length of the new memory chunk.
+    \return EPAI_SUCCESS on success, some error otherwise.
 */
-extern char* epai_new_padding_blob(epai_padding_section_t*);
+extern epai_error_t epai_new_padding_blob(const epai_padding_section_t*,
+					  char**, uint32_t*);
 
 
 #endif /* LIBEPAI_PADDING_H */

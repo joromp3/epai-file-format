@@ -8,7 +8,7 @@
 
 typedef union {
 	epai_section_type_t type;
-	epai_file_signature_section_t file_signature;
+	epai_fsign_section_t fsign;
 	epai_padding_section_t padding;
 	epai_metadata_section_t metadata;
 } epai_section_t;

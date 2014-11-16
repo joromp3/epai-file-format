@@ -8,7 +8,7 @@
 
 typedef struct {
 	epai_section_type_t type;
-} epai_file_signature_section_t;
+} epai_fsign_section_t;
 
 
 /** \fn epai_error_t epai_validate_file_signature_blob(const char* hdr, int len)
@@ -20,12 +20,16 @@ typedef struct {
 extern epai_error_t epai_validate_file_signature_blob(const char*, uint32_t);
 
 
-/** \fn char* epai_new_file_signature_blob()
+/** \fn epai_error_t epai_new_file_signature_blob(const epai_fsign_section_t* ssp,
+                                                  char** out, uint32_t* len)
     \brief Allocate new memory and generate a new file signature binary in it.
     \param ssp Pointer to section struct.
-    \return Pointer to the new file signature binary, or NULL on failure.
+    \param out On success, will be set to a pointer to the new memory.
+    \param len On success, will be set to the length of the new memory chunk.
+    \return EPAI_SUCCESS on success, or some error.
 */
-extern char* epai_new_file_signature_blob(epai_file_signature_section_t*);
+extern epai_error_t epai_new_file_signature_blob(const epai_fsign_section_t*,
+						 char**, uint32_t*);
 
 
 #endif /* LIBEPAI_FILE_SIGNATURE_H */

@@ -34,7 +34,7 @@ extern epai_error_t epai_validate_padding_blob(const char* buffer,
 }
 
 static epai_error_t epai_fill_padding_blob(char* buffer,
-					   epai_padding_section_t* ssp) {
+					   const epai_padding_section_t* ssp) {
 	int i;
 
 	if (ssp->length < 5) {
@@ -52,14 +52,22 @@ static epai_error_t epai_fill_padding_blob(char* buffer,
 	return EPAI_SUCCESS;
 }
 
-extern char* epai_new_padding_blob(epai_padding_section_t* ssp) {
+extern epai_error_t epai_new_padding_blob(const epai_padding_section_t* ssp,
+					  char** out, uint32_t* len) {
 	char* r = malloc(ssp->length);
+	epai_error_t error;
 
-	if (r != NULL) {
-		if (epai_fill_padding_blob(r, ssp) != EPAI_SUCCESS) {
+	if (r == NULL) {
+		error = EPAI_ERROR_MALLOC;
+	} else {
+		error = epai_fill_padding_blob(r, ssp);
+		if (error == EPAI_SUCCESS) {
+			*out = r;
+			*len = ssp->length;
+		} else {
 			free(r);
 		}
 	}
 
-	return r;
+	return error;
 }
