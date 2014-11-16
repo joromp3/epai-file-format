@@ -10,6 +10,8 @@ typedef enum {
 	EPAI_SUCCESS = 0,
 	/* Undefined error (!EPAI_SUCCESS). */
 	EPAI_ERROR_UNSPECIFIED,
+	/* Out of memory. */
+	EPAI_ERROR_MALLOC,
 	/* Bad section type code. */
 	EPAI_ERROR_SECTION_TYPE,
 	/* Bad section length. */
@@ -19,7 +21,9 @@ typedef enum {
 	/* Unsupported format version. */
 	EPAI_ERROR_VERSION_UNSUPPORTED,
 	/* Bad (nonzero) padding. */
-	EPAI_ERROR_NONZERO_PADDING
+	EPAI_ERROR_NONZERO_PADDING,
+	/* Invalid metadata key string. */
+	EPAI_ERROR_METADATA_KEY
 } epai_error_t;
 
 typedef enum {
@@ -44,27 +48,6 @@ typedef enum {
 	EPAI_SECTION_IMAGE = 0x83,
 	EPAI_SECTION_KEYFRAME = 0x84
 } epai_section_type_t;
-
-
-/* Internal structs for section types. */
-
-typedef struct {
-	epai_section_type_t type;
-	uint32_t length;
-} epai_padding_section_t;
-
-typedef struct {
-        epai_section_type_t type;
-	int num_keys;
-	char* keys;
-	char* values;
-} epai_metadata_section_t;
-
-typedef union {
-	epai_section_type_t type;
-	epai_padding_section_t padding;
-	epai_metadata_section_t metadata;
-} epai_section_t;
 
 
 #endif /* LIBEPAI_TYPES_H */

@@ -6,6 +6,12 @@
 #define LIBEPAI_PADDING_H
 
 
+typedef struct {
+	epai_section_type_t type;
+	uint32_t length;
+} epai_padding_section_t;
+
+
 /** \fn epai_error_t epai_validate_padding_blob(const char* buffer, uint32_t len)
     \brief Validate a file padding section in memory.
     \param buffer Pointer to padding section.
@@ -14,20 +20,17 @@
 */
 extern epai_error_t epai_validate_padding_blob(const char*, uint32_t);
 
-/** \fn epai_error_t epai_fill_padding_blob(char* buffer, uint32_t len)
-    \brief Generate a padding section in existing memory.
-    \param buffer Pointer to location to fill with padding.
-    \param len Length of padding section. Must be >=5.
-    \return EPAI_SUCCESS on success; EPAI_ERROR_SECTION_LENGTH if len invalid.
-*/
-extern epai_error_t epai_fill_padding_blob(char*, uint32_t);
 
-/** \fn char* epai_new_padding_blob(uint32_t len)
-    \brief Allocate new memory and generate a new padding section in it.
-    \param len The length of the new padding memory chunk. Must be >=5.
-    \return Pointer to the new padding section, or NULL on failure.
+/** \fn epai_error_t epai_new_padding_blob(const epai_padding_section_t* ssp,
+                                           char** out, uint32_t* len)
+    \brief Allocate new memory and generate a new padding section binary in it.
+    \param ssp Pointer to the section struct.
+    \param out On success, will be set to a pointer to the new memory.
+    \param len On success, will be set to the length of the new memory chunk.
+    \return EPAI_SUCCESS on success, some error otherwise.
 */
-extern char* epai_new_padding_blob(uint32_t);
+extern epai_error_t epai_new_padding_blob(const epai_padding_section_t*,
+					  char**, uint32_t*);
 
 
 #endif /* LIBEPAI_PADDING_H */
