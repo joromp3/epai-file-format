@@ -51,8 +51,7 @@ extern epai_error_t epai_validate_file_signature_blob(const char* buffer,
 	return EPAI_SUCCESS;
 }
 
-extern epai_error_t epai_fill_file_signature_blob(char* buffer,
-						  epai_file_signature_section_t* ssp) {
+static epai_error_t epai_fill_file_signature_blob(char* buffer) {
 
 	*buffer = EPAI_SECTION_FILE_SIGNATURE;
 	*++buffer = 'E';
@@ -74,7 +73,7 @@ extern char* epai_new_file_signature_blob(epai_file_signature_section_t* ssp) {
 	char* r = malloc(file_signature_header_len);
 
 	if (r != NULL) {
-		if (epai_fill_file_signature_blob(r, ssp)) {
+		if (epai_fill_file_signature_blob(r) != EPAI_SUCCESS) {
 			free(r);
 		}
 	}
