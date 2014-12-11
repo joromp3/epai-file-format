@@ -475,8 +475,13 @@ Byte 0 is the section type code.
 Bytes 1-4 form the standard optional section length.
 
 Then follow all of the key-value pairs as null-terminated strings. Keys
-can only contain characters A-Z,a-z (letters), and are case-insensitive.
-Values are UTF-8 encoded strings and can contain any Unicode character.
+can only contain characters A-Z,a-z (english alphabet letters, in
+ascii), and are case-insensitive. Values are UTF-8 encoded strings and
+can contain any Unicode character.
+
+Keys must be shorter than 16 characters. Values can have a maximum
+length of 256 bytes. Null-terminating byte is included in both counts,
+so the real number of visible characters inside is actually one less.
 
 Duplicate keys are not allowed. Empty strings for keys are not allowed.
 Empty strings for values are legal but not recommended.

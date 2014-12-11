@@ -6,13 +6,18 @@
 #define LIBEPAI_METADATA_H
 
 
-#define EPAI_METADATA_MAX_KEYS 256
+#define EPAI_METADATA_MAX_PAIRS 256
+#define EPAI_METADATA_KEY_LEN 16
+#define EPAI_METADATA_VAL_LEN 256
 
 
 typedef struct {
         epai_section_type_t type;
-	char* keys;
-	char* values;
+	int num_pairs;
+	int* keylens;
+	int* vallens;
+	char** keys;
+	char** values;
 } epai_metadata_section_t;
 
 

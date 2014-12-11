@@ -23,7 +23,9 @@ typedef enum {
 	/* Bad (nonzero) padding. */
 	EPAI_ERROR_NONZERO_PADDING,
 	/* Invalid metadata key string. */
-	EPAI_ERROR_METADATA_KEY
+	EPAI_ERROR_METADATA_KEY,
+	/* Parts of metadata section exceed defined limits. */
+	EPAI_ERROR_METADATA_LIMITS
 } epai_error_t;
 
 typedef enum {
