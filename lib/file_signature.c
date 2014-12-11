@@ -18,6 +18,18 @@ static const int file_signature_header_len = 11;
 static int max_format_version = 0x00;
 
 
+static epai_error_t epai_new_file_signature_struct(epai_fsign_section_t** ssp) {
+	*ssp = malloc(sizeof(**ssp));
+	if (*ssp == NULL) {
+		return EPAI_ERROR_MALLOC;
+	}
+
+	(*ssp)->type = EPAI_SECTION_PADDING;
+
+	return EPAI_SUCCESS;
+}
+
+
 extern epai_error_t epai_validate_file_signature_blob(const char* buffer,
 						      uint32_t len) {
 	unsigned int endian_marker;
@@ -50,6 +62,26 @@ extern epai_error_t epai_validate_file_signature_blob(const char* buffer,
 
 	return EPAI_SUCCESS;
 }
+
+
+extern epai_error_t epai_parse_file_signature_blob(epai_fsign_section_t** ssp,
+		const char* buffer) {
+	epai_error_t error = epai_validate_file_signature_blob(buffer,
+			file_signature_header_len);
+
+	if (error) {
+		return error;
+	}
+
+	error = epai_new_file_signature_struct(ssp);
+
+	if (error) {
+		return error;
+	}
+
+	return EPAI_SUCCESS;
+}
+
 
 static epai_error_t epai_fill_file_signature_blob(char* buffer) {
 	*buffer = EPAI_SECTION_FILE_SIGNATURE;
