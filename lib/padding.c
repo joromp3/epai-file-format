@@ -5,8 +5,10 @@
  * section in the EPAI format.
  */
 
+
 #include "common.h"
 #include "epai.h"
+
 
 static epai_error_t epai_new_padding_struct(epai_padding_section_t** ssp,
 		uint32_t len) {
@@ -24,6 +26,7 @@ static epai_error_t epai_new_padding_struct(epai_padding_section_t** ssp,
 
 	return EPAI_SUCCESS;
 }
+
 
 extern epai_error_t epai_validate_padding_blob(const char* buffer, uint32_t len) {
 	int i;
@@ -47,6 +50,7 @@ extern epai_error_t epai_validate_padding_blob(const char* buffer, uint32_t len)
 	return EPAI_SUCCESS;
 }
 
+
 extern epai_error_t epai_parse_padding_blob(epai_padding_section_t** ssp,
 		const char* buffer, uint32_t len) {
 	epai_error_t error = epai_validate_padding_blob(buffer, len);
@@ -63,6 +67,7 @@ extern epai_error_t epai_parse_padding_blob(epai_padding_section_t** ssp,
 
 	return EPAI_SUCCESS;
 }
+
 
 static epai_error_t epai_fill_padding_blob(char* buffer,
 		const epai_padding_section_t* ssp) {
