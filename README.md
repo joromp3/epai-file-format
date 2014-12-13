@@ -14,9 +14,13 @@ different channels in the same image. Every pixel can carry multiple
 channels to accomodate for extra information such as alpha, depth
 normals, diffuse/specularity, etc alongside the color information.
 
-At this stage, the specification and implementation are still in draft
-stage and incomplete. They may change at any time, and the code here is
-unstable and in early stages of development.
+Currently, the specification and implementation are still in draft stage
+and incomplete. They may change at any time, and the code here is
+unstable and in early stages of development. The API constantly changes.
+For now, all definitions in the library are made public through the main
+header, to help with testing and development. As time passes and things
+stabilize, a lot of them will become internal and a more streamlined
+public interface will be designed.
 
 This repository will contain the reference implementation of the format,
 including a general purpose library, and encoding/decoding utilities.

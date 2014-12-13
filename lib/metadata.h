@@ -21,13 +21,37 @@ typedef struct {
 } epai_metadata_section_t;
 
 
-/** \fn epai_error_t epai_validate_metadata_blob(const char* buf, uint32_t len)
-    \brief Validate a text metadata section in memory.
-    \param buf Pointer to text metadata section.
-    \param len Length of text metadata section, including section header.
-    \return EPAI_SUCCESS if valid, or the error if not.
-*/
-extern epai_error_t epai_validate_metadata_blob(const char*, uint32_t);
+/* check if all characters in a string are valid for a metadata key */
+extern int epai_metadata_validate_key_string(const char*, uint32_t);
+
+/* free/destroy a metadata struct */
+extern void epai_metadata_free_struct(epai_metadata_section_t*);
+
+/* allocate a new metadata struct */
+extern epai_error_t epai_metadata_new_struct(epai_metadata_section_t**);
+
+/* add a new metadata pair to a struct */
+extern epai_error_t epai_metadata_add_pair(epai_metadata_section_t*,
+		const char*, const char*);
+
+/* remove a metadata pair with index */
+extern epai_error_t epai_metadata_remove_pair_by_index(epai_metadata_section_t*,
+		int);
+
+/* validate a blob of encoded metadata */
+extern epai_error_t epai_metadata_validate_blob(const char*, uint32_t);
+
+/* parse a blob of encoded metadata into a new struct */
+extern epai_error_t epai_metadata_parse_blob(epai_metadata_section_t**,
+		const char*, uint32_t);
+
+/* encode a metadata section into an existing buffer */
+extern epai_error_t epai_metadata_fill_blob(const epai_metadata_section_t*,
+	char*, uint32_t);
+
+/* encode a metadata section into a new buffer */
+extern epai_error_t epai_metadata_new_blob(const epai_metadata_section_t*,
+		char**, uint32_t*);
 
 
 #endif /* LIBEPAI_METADATA_H */

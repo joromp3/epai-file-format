@@ -14,12 +14,7 @@ typedef union {
 } epai_section_t;
 
 
-/** \fn epai_error_t epai_validate_optional_section_blob(const char* buffer, uint32_t len)
-    \brief Validate an optional section in memory.
-    \param buffer Pointer to optional section.
-    \param len Length of optional section, including section header.
-    \return EPAI_SUCCESS if valid, or the error if not.
-*/
+/* validate the common parts of optional sections in a blob of encoded data. */
 extern epai_error_t epai_validate_optional_section_blob(const char*, uint32_t);
 
 

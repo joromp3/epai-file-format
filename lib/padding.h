@@ -12,24 +12,25 @@ typedef struct {
 } epai_padding_section_t;
 
 
-/** \fn epai_error_t epai_validate_padding_blob(const char* buffer, uint32_t len)
-    \brief Validate a file padding section in memory.
-    \param buffer Pointer to padding section.
-    \param len Length of padding section, including section header.
-    \return EPAI_SUCCESS if valid, or the error if not.
-*/
-extern epai_error_t epai_validate_padding_blob(const char*, uint32_t);
+/* free an existing padding struct */
+extern void epai_padding_free_struct(epai_padding_section_t*);
 
+/* allocate a new padding struct */
+extern epai_error_t epai_padding_new_struct(epai_padding_section_t**);
 
-/** \fn epai_error_t epai_new_padding_blob(const epai_padding_section_t* ssp,
-                                           char** out, uint32_t* len)
-    \brief Allocate new memory and generate a new padding section binary in it.
-    \param ssp Pointer to the section struct.
-    \param out On success, will be set to a pointer to the new memory.
-    \param len On success, will be set to the length of the new memory chunk.
-    \return EPAI_SUCCESS on success, some error otherwise.
-*/
-extern epai_error_t epai_new_padding_blob(const epai_padding_section_t*,
+/* validate a blob with encoded padding data */
+extern epai_error_t epai_padding_validate_blob(const char*, uint32_t);
+
+/* parse a padding blob into a new struct */
+extern epai_error_t epai_padding_parse_blob(epai_padding_section_t**,
+		const char*, uint32_t);
+
+/* encode a padding section into an existing buffer */
+extern epai_error_t epai_padding_fill_blob(const epai_padding_section_t*,
+		char*, uint32_t);
+
+/* encode a padding section into a new buffer */
+extern epai_error_t epai_padding_new_blob(const epai_padding_section_t*,
 					  char**, uint32_t*);
 
 

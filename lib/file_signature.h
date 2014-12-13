@@ -11,25 +11,26 @@ typedef struct {
 } epai_fsign_section_t;
 
 
-/** \fn epai_error_t epai_validate_file_signature_blob(const char* hdr, int len)
-    \brief Validate a file signature header in memory.
-    \param hdr Pointer to file signature header.
-    \param len Length of file signature header (must be 11).
-    \return EPAI_SUCCESS if valid, or the error if not.
-*/
-extern epai_error_t epai_validate_file_signature_blob(const char*, uint32_t);
+/* free an existing file signature structure */
+extern void epai_file_signature_free_struct(epai_fsign_section_t*);
 
+/* allocate a new file signature structure */
+extern epai_error_t epai_file_signature_new_struct(epai_fsign_section_t**);
 
-/** \fn epai_error_t epai_new_file_signature_blob(const epai_fsign_section_t* ssp,
-                                                  char** out, uint32_t* len)
-    \brief Allocate new memory and generate a new file signature binary in it.
-    \param ssp Pointer to section struct.
-    \param out On success, will be set to a pointer to the new memory.
-    \param len On success, will be set to the length of the new memory chunk.
-    \return EPAI_SUCCESS on success, or some error.
-*/
-extern epai_error_t epai_new_file_signature_blob(const epai_fsign_section_t*,
-						 char**, uint32_t*);
+/* validate a binary blob of encoded file signature data */
+extern epai_error_t epai_file_signature_validate_blob(const char*, uint32_t);
+
+/* parse a binary blob of encoded file signature data into a new struct */
+extern epai_error_t epai_file_signature_parse_blob(epai_fsign_section_t**,
+		const char*, uint32_t);
+
+/* encode a file signature into an existing buffer */
+extern epai_error_t epai_file_signature_fill_blob(const epai_fsign_section_t*,
+		char*, uint32_t);
+
+/* allocate a new buffer and encode a file signature into it */
+extern epai_error_t epai_file_signature_new_blob(const epai_fsign_section_t*,
+		char**, uint32_t*);
 
 
 #endif /* LIBEPAI_FILE_SIGNATURE_H */
