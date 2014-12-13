@@ -86,6 +86,15 @@ extern epai_error_t epai_file_signature_parse_blob(epai_fsign_section_t** ssp,
 }
 
 
+extern uint32_t epai_file_signature_parse_length(const char* buffer) {
+	return file_signature_header_len;
+}
+
+extern uint32_t epai_file_signature_encode_length(const epai_fsign_section_t* ssp) {
+	return file_signature_header_len;
+}
+
+
 extern epai_error_t epai_file_signature_fill_blob(const epai_fsign_section_t* ssp,
 		char* buffer, uint32_t len) {
 

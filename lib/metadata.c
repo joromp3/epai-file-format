@@ -24,6 +24,35 @@ extern int epai_metadata_validate_key_string(const char* key, uint32_t len) {
 }
 
 
+/* currently unused function but could be useful. */
+static epai_error_t epai_metadata_update_length(epai_metadata_section_t* ssp) {
+	uint32_t l;
+	int i;
+
+	if (ssp->num_pairs > EPAI_METADATA_MAX_PAIRS) {
+		return EPAI_ERROR_METADATA_LIMITS;
+	}
+
+	for (i = 0; i < ssp->num_pairs; ++i) {
+		if (ssp->keylens[i] > EPAI_METADATA_KEY_LEN) {
+			return EPAI_ERROR_METADATA_LIMITS;
+		}
+
+		l += ssp->keylens[i] + 1;
+
+		if (ssp->vallens[i] > EPAI_METADATA_VAL_LEN) {
+			return EPAI_ERROR_METADATA_LIMITS;
+		}
+
+		l += ssp->vallens[i] + 1;
+	}
+
+	ssp->length = l + 5;
+
+	return EPAI_SUCCESS;
+}
+
+
 extern void epai_metadata_free_struct(epai_metadata_section_t* ssp) {
 	int i;
 	if (ssp->keys != NULL) {
@@ -58,6 +87,7 @@ extern epai_error_t epai_metadata_new_struct(epai_metadata_section_t** ssp) {
 
 	ns->type = EPAI_SECTION_METADATA;
 	ns->num_pairs = 0;
+	ns->length = 5;
 
 	ns->keylens = calloc(EPAI_METADATA_MAX_PAIRS, sizeof(int));
 	ns->vallens = calloc(EPAI_METADATA_MAX_PAIRS, sizeof(int));
@@ -102,6 +132,7 @@ extern epai_error_t epai_metadata_add_pair(epai_metadata_section_t* ssp,
 	ssp->keylens[ssp->num_pairs] = keylen;
 	ssp->vallens[ssp->num_pairs] = vallen;
 	++ssp->num_pairs;
+	ssp->length += keylen + vallen + 2;
 
 	return EPAI_SUCCESS;
 }
@@ -115,6 +146,8 @@ extern epai_error_t epai_metadata_remove_pair_by_index(epai_metadata_section_t* 
 	    index < 0) {
 		return EPAI_ERROR_METADATA_LIMITS;
 	}
+
+	ssp->length -= ssp->keylens[index] + ssp->vallens[index] + 2;
 
 	/* Rotate pointers. */
 	tempk = ssp->keys[index];
@@ -220,44 +253,27 @@ extern epai_error_t epai_metadata_parse_blob(epai_metadata_section_t** ssp,
 }
 
 
-static uint32_t epai_metadata_calculate_blob_length(const epai_metadata_section_t* ssp) {
-	uint32_t l;
-	int i;
+extern uint32_t epai_metadata_parse_length(const char* buffer) {
+	/* FIXME endian */
+	return *(uint32_t*)(buffer + 1);
+}
 
-	if (ssp->num_pairs > EPAI_METADATA_MAX_PAIRS) {
-		return EPAI_ERROR_METADATA_LIMITS;
-	}
-
-	for (i = 0; i < ssp->num_pairs; ++i) {
-		if (ssp->keylens[i] > EPAI_METADATA_KEY_LEN) {
-			return EPAI_ERROR_METADATA_LIMITS;
-		}
-
-		l += ssp->keylens[i] + 1;
-
-		if (ssp->vallens[i] > EPAI_METADATA_VAL_LEN) {
-			return EPAI_ERROR_METADATA_LIMITS;
-		}
-
-		l += ssp->vallens[i] + 1;
-	}
-
-	return l + 5;
+extern uint32_t epai_metadata_encode_length(const epai_metadata_section_t* ssp) {
+	return ssp->length;
 }
 
 
 extern epai_error_t epai_metadata_fill_blob(const epai_metadata_section_t* ssp,
 	char* out, uint32_t len) {
 	int i;
-	uint32_t l = epai_metadata_calculate_blob_length(ssp);
 
-	if (l > len) {
+	if (len != ssp->length) {
 		return EPAI_ERROR_SECTION_LENGTH;
 	}
 
 	*out = EPAI_SECTION_METADATA;
 	/* FIXME handle endian */
-	*(uint32_t*)(out + 1) = l - 5;
+	*(uint32_t*)(out + 1) = ssp->length - 5;
 	out += 5;
 
 	for (i = 0; i < ssp->num_pairs; ++i) {
@@ -273,23 +289,20 @@ extern epai_error_t epai_metadata_fill_blob(const epai_metadata_section_t* ssp,
 extern epai_error_t epai_metadata_new_blob(const epai_metadata_section_t* ssp,
 					   char** out, uint32_t* len) {
 	epai_error_t err;
-	uint32_t l;
 	char *r;
 
-	l = epai_metadata_calculate_blob_length(ssp);
-
-	r = malloc(l);
+	r = malloc(ssp->length);
 	if (r == NULL) {
 		return EPAI_ERROR_MALLOC;
 	}
 
-	err = epai_metadata_fill_blob(ssp, r, l);
+	err = epai_metadata_fill_blob(ssp, r, ssp->length);
 	if (err) {
 		return err;
 	}
 
 	*out = r;
-	*len = l;
+	*len = ssp->length;
 
 	return EPAI_SUCCESS;
 }

@@ -69,6 +69,16 @@ extern epai_error_t epai_padding_parse_blob(epai_padding_section_t** ssp,
 }
 
 
+extern uint32_t epai_padding_parse_length(const char* buffer) {
+	/* FIXME endian */
+	return *(uint32_t*)(buffer + 1);
+}
+
+extern uint32_t epai_padding_encode_length(const epai_padding_section_t* ssp) {
+	return ssp->length;
+}
+
+
 extern epai_error_t epai_padding_fill_blob(const epai_padding_section_t* ssp,
 		char* buffer, uint32_t len) {
 	int i;

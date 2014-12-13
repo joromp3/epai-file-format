@@ -33,5 +33,11 @@ extern epai_error_t epai_padding_fill_blob(const epai_padding_section_t*,
 extern epai_error_t epai_padding_new_blob(const epai_padding_section_t*,
 					  char**, uint32_t*);
 
+/* return the length of the encoded padding section at pointer */
+extern uint32_t epai_padding_parse_length(const char*);
+
+/* return the length needed to encode padding */
+extern uint32_t epai_padding_encode_length(const epai_padding_section_t*);
+
 
 #endif /* LIBEPAI_PADDING_H */

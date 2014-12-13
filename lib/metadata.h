@@ -13,6 +13,7 @@
 
 typedef struct {
         epai_section_type_t type;
+        uint32_t length;
 	int num_pairs;
 	int* keylens;
 	int* vallens;
@@ -52,6 +53,12 @@ extern epai_error_t epai_metadata_fill_blob(const epai_metadata_section_t*,
 /* encode a metadata section into a new buffer */
 extern epai_error_t epai_metadata_new_blob(const epai_metadata_section_t*,
 		char**, uint32_t*);
+
+/* return the length of the encoded metadata section at pointer */
+extern uint32_t epai_metadata_parse_length(const char*);
+
+/* return the length needed to encode metadata */
+extern uint32_t epai_metadata_encode_length(const epai_metadata_section_t*);
 
 
 #endif /* LIBEPAI_METADATA_H */

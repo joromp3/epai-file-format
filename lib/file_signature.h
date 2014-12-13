@@ -32,6 +32,12 @@ extern epai_error_t epai_file_signature_fill_blob(const epai_fsign_section_t*,
 extern epai_error_t epai_file_signature_new_blob(const epai_fsign_section_t*,
 		char**, uint32_t*);
 
+/* return the length of the encoded file signature section at pointer */
+extern uint32_t epai_file_signature_parse_length(const char*);
+
+/* return the length needed to encode file signature */
+extern uint32_t epai_file_signature_encode_length(const epai_fsign_section_t*);
+
 
 #endif /* LIBEPAI_FILE_SIGNATURE_H */
 
