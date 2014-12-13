@@ -99,6 +99,8 @@ extern epai_error_t epai_add_metadata_pair(epai_metadata_section_t* ssp,
 
 	strncpy(ssp->keys[ssp->num_pairs], key, EPAI_METADATA_KEY_LEN);
 	strncpy(ssp->values[ssp->num_pairs], value, EPAI_METADATA_VAL_LEN);
+	ssp->keylens[ssp->num_pairs] = keylen;
+	ssp->vallens[ssp->num_pairs] = vallen;
 	++ssp->num_pairs;
 
 	return EPAI_SUCCESS;
@@ -120,10 +122,14 @@ extern epai_error_t epai_remove_metadata_pair_by_index(epai_metadata_section_t* 
 	for (i = index; i < ssp->num_pairs;++i) {
 		ssp->keys[i] = ssp->keys[i+1];
 		ssp->values[i] = ssp->values[i+1];
+		ssp->keylens[i] = ssp->keylens[i+1];
+		ssp->vallens[i] = ssp->vallens[i+1];
 	}
 	--ssp->num_pairs;
 	ssp->keys[ssp->num_pairs] = tempk;
 	ssp->values[ssp->num_pairs] = tempv;
+	ssp->keylens[ssp->num_pairs] = 0;
+	ssp->vallens[ssp->num_pairs] = 0;
 
 	return EPAI_SUCCESS;
 }
