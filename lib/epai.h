@@ -13,6 +13,8 @@
 #include "metadata.h"
 #include "generic_section.h"
 
+#include "file.h"
+
 
 #endif /* LIBEPAI_EPAI_H */
 
