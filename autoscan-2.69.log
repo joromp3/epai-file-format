@@ -1,0 +1,22 @@
+autoscan-2.69: warning: missing AC_FUNC_MALLOC wanted by: 
+	lib/file_signature.c:76
+	lib/padding.c:55
+autoscan-2.69: warning: missing AC_PREREQ wanted by: 
+	autoscan-2.69
+autoscan-2.69: warning: missing AC_TYPE_UINT32_T wanted by: 
+	lib/file_signature.c:22
+	lib/file_signature.c:54
+	lib/file_signature.h:15
+	lib/file_signature.h:23
+	lib/generic_section.c:13
+	lib/generic_section.c:14
+	lib/generic_section.c:25
+	lib/generic_section.h:15
+	lib/padding.c:14
+	lib/padding.c:36
+	lib/padding.c:45
+	lib/padding.c:54
+	lib/padding.h:15
+	lib/padding.h:23
+	lib/padding.h:30
+	lib/types.h:53

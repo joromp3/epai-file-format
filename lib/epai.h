@@ -12,6 +12,7 @@
 #include "padding.h"
 #include "metadata.h"
 #include "generic_section.h"
+#include "checksum.h"
 
 #include "file.h"
 
