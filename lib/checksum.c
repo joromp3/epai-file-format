@@ -50,7 +50,7 @@ extern void epai_checksum_free_struct(epai_checksum_section_t* ssp) {
 	free(ssp);
 }
 
-extern epai_error_t epai_checksum_new_struct(epai_paddchecksuming_section_t** ssp) {
+extern epai_error_t epai_checksum_new_struct(epai_checksum_section_t** ssp) {
 	*ssp = malloc(sizeof(**ssp));
 	if (*ssp == NULL) {
 		return EPAI_ERROR_MALLOC;
@@ -92,7 +92,8 @@ extern epai_error_t epai_checksum_parse_blob(epai_checksum_section_t** ssp,
 	}
 
 	error = epai_checksum_new_struct(ssp);
-	(*ssp)->length = len;
+	(*ssp)->length =*(uint32_t*) buffer+1;
+	(*ssp)->checksum = *(uint32_t*) buffer+5;
 
 	if (error) {
 		return error;
@@ -124,12 +125,17 @@ extern epai_error_t epai_checksum_fill_blob(const epai_checksum_section_t* ssp,
 
 	/* FIXME handle endian */
 	*(uint32_t*) (buffer + 1) = ssp->length - 9;
-
-	uint32_t res=epai_crc32(0,buffer+9,len-9);
-	*(uint32_t*) (buffer + 5) = res;	
+	*(uint32_t*) (buffer + 5) = ssp->checksum;	
 
 	return EPAI_SUCCESS;
 }
+
+extern uint32_t epai_checksum_calculate ( epai_checksum_section_t* ssp,char *buffer, uint32_t len) {
+	uint32_t res=epai_crc32(0,buffer,len);
+	ssp->checksum=res;
+}
+
+
 
 extern epai_error_t epai_checksum_new_blob(const epai_checksum_section_t* ssp,
 		char** out, uint32_t* len) {
