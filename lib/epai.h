@@ -15,6 +15,7 @@
 #include "checksum.h"
 
 #include "file.h"
+#include "decoder.h"
 
 
 #endif /* LIBEPAI_EPAI_H */
