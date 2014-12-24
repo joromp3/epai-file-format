@@ -15,11 +15,8 @@ typedef struct {
 /* free encoder struct */
 extern void epai_encoder_free(epai_encoder_t*, int);
 
-/* create new encoder struct and file struct */
-extern epai_error_t epai_encoder_new(epai_encoder_t**);
-
-/* create new encoder struct with existing file struct */
-extern epai_error_t epai_encoder_new_with_file(epai_encoder_t**, epai_file_t*);
+/* create new encoder struct */
+extern epai_error_t epai_encoder_new(epai_encoder_t**, epai_file_t*);
 
 /* actually perform encoding process */
 extern epai_error_t epai_encoder_encode_to_ptr(const epai_decoder_t*, char**);

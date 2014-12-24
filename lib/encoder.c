@@ -14,34 +14,29 @@ extern void epai_encoder_free(epai_encoder_t* es, int free_file) {
 	free(es);
 }
 
-extern epai_error_t epai_encoder_new_with_file(epai_encoder_t** es, epai_file_t* f) {
-	epai_encoder_t* ns = malloc(sizeof(*ns));
+extern epai_error_t epai_encoder_new(epai_encoder_t** es, epai_file_t* f) {
+	epai_file_t* nf = f;
+	epai_encoder_t* ns;
+	epai_error_t err;
 
+	if (f == NULL) {
+		err = epai_file_new(&nf, EPAI_ENDIAN_LITTLE);
+		if (err) {
+			return err;
+		}
+	}
+
+	ns = malloc(sizeof(*ns));
 	if (ns == NULL) {
+		if (f == NULL) {
+			epai_file_free(nf);
+		}
 		return EPAI_ERROR_MALLOC;
 	}
 
-	ns->file = f;
+	ns->file = nf;
 
 	*es = ns;
-
-	return EPAI_SUCCESS;
-}
-
-extern epai_error_t epai_encoder_new(epai_encoder_t** es) {
-	epai_file_t* nf;
-	epai_error_t err;
-
-	err = epai_file_new(&nf, EPAI_ENDIAN_LITTLE);
-	if (err) {
-		return err;
-	}
-
-	err = epai_encoder_new_with_file(es, nf);
-	if (err) {
-		epai_file_free(nf);
-		return err;
-	}
 
 	return EPAI_SUCCESS;
 }
