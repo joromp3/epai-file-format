@@ -22,6 +22,12 @@ header, to help with testing and development. As time passes and things
 stabilize, a lot of them will become internal and a more streamlined
 public interface will be designed.
 
+The library currently only encodes to and decodes from memory buffers,
+as it is easier to develop and test the code this way. This, however, is
+not scalable to production scenarios where large files with large images
+can be used. As the code matures, a more flexible encode/decode mode
+using file I/O will be added.
+
 This repository will contain the reference implementation of the format,
 including a general purpose library, and encoding/decoding utilities.
 

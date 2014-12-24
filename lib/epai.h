@@ -16,6 +16,7 @@
 
 #include "file.h"
 #include "decoder.h"
+#include "encoder.h"
 
 
 #endif /* LIBEPAI_EPAI_H */
