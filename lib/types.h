@@ -12,6 +12,8 @@ typedef enum {
 	EPAI_ERROR_UNSPECIFIED,
 	/* Out of memory. */
 	EPAI_ERROR_MALLOC,
+	/* Invalid operation. */
+	EPAI_ERROR_BAD_OPERATION,
 	/* Bad section type code. */
 	EPAI_ERROR_SECTION_TYPE,
 	/* Bad section length. */

@@ -60,3 +60,9 @@ extern epai_error_t epai_file_add_section(epai_file_t* efp, epai_section_t* ssp)
 
 	return EPAI_SUCCESS;
 }
+
+
+extern epai_error_t epai_file_validate_struct(epai_file_t* efp) {
+	/* TODO add code to check if file has all mandatory sections, etc */
+	return EPAI_SUCCESS;
+}

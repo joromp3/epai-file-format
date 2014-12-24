@@ -20,10 +20,13 @@ typedef struct {
 extern void epai_file_free(epai_file_t*);
 
 /* create new file struct */
-extern epai_error_t epai_file_new(epai_file_t** efp, epai_endian_t endian);
+extern epai_error_t epai_file_new(epai_file_t**, epai_endian_t);
 
 /* add a section to a file */
-extern epai_error_t epai_file_add_section(epai_file_t* efp, epai_section_t* ssp);
+extern epai_error_t epai_file_add_section(epai_file_t*, epai_section_t*);
+
+/* validate a file structure */
+extern epai_error_t epai_file_validate_struct(epai_file_t*);
 
 
 #endif /* EPAI_FILE_H */

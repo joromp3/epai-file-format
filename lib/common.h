@@ -32,13 +32,13 @@
 #  include <memory.h>
 #endif /* HAVE_MEMORY_H */
 
-#if HAVE_ENDIAN_H
-#  include <endian.h>
-#endif /* HAVE_ENDIAN_H */
+#include <endian.h>
 
 #if HAVE_UNISTD_H
 #  include <unistd.h>
 #endif /* HAVE_MEMORY_H */
+
+#include <stdio.h>
 
 
 #endif /* LIBEPAI_COMMON_H */
