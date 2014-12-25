@@ -77,7 +77,7 @@ extern epai_error_t epai_decoder_decode(epai_decoder_t* ds) {
 		total_len -= sec_len;
 	}
 
-	err = epai_file_validate(ds->file);
+	err = epai_file_validate_struct(ds->file);
 
 	return EPAI_SUCCESS;
 }

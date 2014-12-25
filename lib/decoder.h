@@ -18,7 +18,7 @@ typedef struct {
 extern void epai_decoder_free(epai_decoder_t*);
 
 /* create new decoder struct */
-extern epai_error_t epai_decoder_new_from_ptr(epai_decoder_t**, const char*);
+extern epai_error_t epai_decoder_new_from_ptr(epai_decoder_t**, const char*, size_t);
 
 /* actually perform decoding process */
 extern epai_error_t epai_decoder_decode(epai_decoder_t*);

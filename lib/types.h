@@ -14,6 +14,8 @@ typedef enum {
 	EPAI_ERROR_MALLOC,
 	/* Invalid operation. */
 	EPAI_ERROR_BAD_OPERATION,
+	/* Problem with file I/O. */
+	EPAI_ERROR_FILEIO,
 	/* Bad section type code. */
 	EPAI_ERROR_SECTION_TYPE,
 	/* Bad section length. */
