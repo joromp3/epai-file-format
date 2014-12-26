@@ -344,11 +344,11 @@ number of image sections in the same file is 256.
 
 This section can only be contained within section type 0x80 (File
 Signature).  It can contain multiple sections of type 0x84 (Keyframe),
-0x04 (Delta Frame), and 0x02 (Compressed Text), as well as no more than
-one section of type 0x01 (Text Metadata), and type 0x06 (Spritesheet
-Data). It must contain at least one section of type 0x84 (Keyframe). No
-section of type 0x04 (Delta Frame) may appear before the first section
-of type 0x84 (Keyframe).
+0x04 (Delta Frame), 0x02 (Compressed Text), and 0x00 (Padding), as well
+as no more than one section of type 0x01 (Text Metadata), and type 0x06
+(Spritesheet Data). It must contain at least one section of type 0x84
+(Keyframe). No section of type 0x04 (Delta Frame) may appear before the
+first section of type 0x84 (Keyframe).
 
 Image sections have the following syntax:
 
@@ -387,8 +387,8 @@ Implementations are allowed to implement their own selection of
 additional algorithms beyond the ones above if they so desire.
 
 Then follow any optional sections (such as text metadata, compressed
-text, spritesheet data) in any order. All such sections must appear
-before the first keyframe section in the image.
+text, spritesheet data, padding) in any order. All such sections must
+appear before the first keyframe section in the image.
 
 Then follows the first keyframe section. In the case of a static image,
 there will be no more frames after it. In the case of an animated image,
@@ -432,7 +432,8 @@ The first byte is the section type code.
 
 Then follows a 16-bit unsigned integer value representing the duration
 of the frame, in microseconds. During playback, the frame should ideally
-be displayed for this duration of time.
+be displayed for this duration of time. For static images, the value of
+this field is irrelevant. This value must be nonzero.
 
 Then follows the compressed datastream, containing a filter type array
 and the encoded pixel data, compressed in one solid chunk with the
@@ -441,9 +442,9 @@ is contained.
 
 The first part of the compressed datastream is an array of 8-bit
 unsigned integer values indicating the filtering algorithm used for each
-row of pixels. This allows the filtering algorithm to be adaptively
-changed with every row of pixels for optimal compressability of the
-data. The size of the array is equal to the height of the frame.
+scanline (row of pixels). This allows the filtering algorithm to be
+adaptively changed with every scanline for optimal compressability of
+the data. The size of the array is equal to the height of the frame.
 
 More information on filtering will follow further below.
 
@@ -529,9 +530,9 @@ Multi-byte values must be in the byte order specified by the endian
 marker in the file signature.
 
 The actual values of each channel in each pixel are determined by the
-filtering algorithm used. Every row of pixels can use a different
-filtering algorithm, as indicated by the corresponding element in the
-filter type array preceding the pixel data in the keyframe. The
+filtering algorithm used. Every scanline (row of pixels) can use a
+different filtering algorithm, as indicated by the corresponding element
+in the filter type array preceding the pixel data in the keyframe. The
 following filter type values are defined:
 
 	Value	Meaning
@@ -806,8 +807,8 @@ Bytes 7-14 of the section header represent the x coordinate, y
 coordinate, width, and height, in this order, of the rectangle within
 the entire image that the frame encodes. x+width must not exceed the
 width of the entire image and y+height must not exceed the height of the
-entire image. These coordinates are measured from left to right (x) and
-from top to bottom (y).
+entire image. Width and height must be nonzero. These coordinates are
+measured from left to right (x) and from top to bottom (y).
 
 Bytes 1-4 are the mandatory section length as required by all optional
 section types.
