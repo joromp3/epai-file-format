@@ -115,7 +115,7 @@ List of all section types:
 0x01		checksum
 0x02		text metadata
 0x03		compressed text
-0x04		frame
+0x04		delta frame
 0x05		gamma correction
 0x06		spritesheet data
 0x07-0x3F	(reserved for future standard use)
@@ -226,10 +226,10 @@ The data type value indicates the binary format for the channel data. It
 can have one of the following values:
 
 	Value	Meaning
-	0000	4-bit unsigned integer
-	0001	8-bit unsigned integer
-	0010	16-bit unsigned integer
-	0011	24-bit unsigned integer
+	0000	1-bit unsigned integer
+	0001	4-bit unsigned integer
+	0010	8-bit unsigned integer
+	0011	16-bit unsigned integer
 	0100	32-bit unsigned integer
 	0101	reserved for future standard use
 	0110	private use
@@ -305,7 +305,8 @@ Palette sections have the following syntax:
 	1 byte	reference to pixel format section
 	...	... more references ...
 	1 byte	number of colors
-	3 bytes	color encoded in 24-bit (8 bpc) RGB
+*	3 bytes	color encoded in 24-bit (8 bpc) RGB
+OR	12 byte	color encoded in 32-bit float RGB
 	...	... more colors ...
 
 Byte 0 is the section type code.
@@ -336,12 +337,250 @@ order.
 
 ### Section 0x83: Image
 
-// TODO
+This section type is used to store an image (animated or not).
+
+There must be at least one image section in every file. The maximum
+number of image sections in the same file is 256.
+
+This section can only be contained within section type 0x80 (File
+Signature).  It can contain multiple sections of type 0x84 (Keyframe),
+0x04 (Delta Frame), and 0x02 (Compressed Text), as well as no more than
+one section of type 0x01 (Text Metadata), and type 0x06 (Spritesheet
+Data). It must contain at least one section of type 0x84 (Keyframe). No
+section of type 0x04 (Delta Frame) may appear before the first section
+of type 0x84 (Keyframe).
+
+Image sections have the following syntax:
+
+	Size	Value
+	1 byte	0x83
+	2 bytes	image width
+	2 bytes image height
+	2 bytes number of frames in animation (1 for static images)
+	1 byte	reference to pixel format for image data
+	4 bytes name of compression algorithm used for frame data
+	... optional non-frame sections ...
+	... first keyframe ...
+	... more frames and/or keyframes ...
+
+The first byte is the section type code.
+
+After it follow two 16-bit unsigned integers representing the image
+dimensions. Then follows the total number of frames (keyframe and frame
+sections) in the image. All of these values must be nonzero.
+
+Then follows one byte referring by index to the pixel format section
+that describes the format of the pixel data in the image's frames.
+
+Then follow four ASCII characters representing the name of the
+compression algorithm used for the last stage of encoding the pixel data
+in each frame.  The four characters must be either uppercase or digits.
+Names shorter than four characters must be padded by spaces on the left.
+The following compression algorithms are standard and should be
+supported by all implementations:
+
+	Name	Description
+	"COPY"	No compression applied
+	"ZLIB"	Standard Deflate algorithm as implemented by zlib
+
+Implementations are allowed to implement their own selection of
+additional algorithms beyond the ones above if they so desire.
+
+Then follow any optional sections (such as text metadata, compressed
+text, spritesheet data) in any order. All such sections must appear
+before the first keyframe section in the image.
+
+Then follows the first keyframe section. In the case of a static image,
+there will be no more frames after it. In the case of an animated image,
+it will be followed by additional frames (keyframes or delta frames).
+
+All frames in the image must appear in their exact playback order.
+
+An animation can contain a maximum of 65535 (2^16-1) frames, at least
+one of which (the first) is a keyframe. Whether to encode each
+subsequent animation frame as a keyframe or a delta frame is a choice
+left to the encoding implementation.
+
+Supporting animated images is not a requirement for implementations. If
+an implementation only supports static images, it may decode only the
+first keyframe and ignore all other frames.
 
 
 ### Section 0x84: Keyframe
 
-// TODO
+This section type contains the actual pixel data for an animation frame,
+encoded in a way that does not refer to any other frame in the image.
+This is the section type to use for the first frame in any animation,
+for static images, and for intermediate animation frames for which the
+ability to skip to them during playback without having to decode other
+frames is desired.
+
+This section type may only appear contained within sections of type 0x83
+(Image). Every image section must contain at least one section of this
+type (representing the first frame of an animation or a static image).
+More such sections can be placed within an image if and as desired. This
+section type cannot contain other sections.
+
+Keyframe sections have the following syntax:
+
+	Size	Value
+	1 byte	0x84
+	2 bytes	frame duration in microseconds
+	... compressed datastream ...
+
+The first byte is the section type code.
+
+Then follows a 16-bit unsigned integer value representing the duration
+of the frame, in microseconds. During playback, the frame should ideally
+be displayed for this duration of time.
+
+Then follows the compressed datastream, containing a filter type array
+and the encoded pixel data, compressed in one solid chunk with the
+algorithm specified in the image section in which the keyframe section
+is contained.
+
+The first part of the compressed datastream is an array of 8-bit
+unsigned integer values indicating the filtering algorithm used for each
+row of pixels. This allows the filtering algorithm to be adaptively
+changed with every row of pixels for optimal compressability of the
+data. The size of the array is equal to the height of the frame.
+
+More information on filtering will follow further below.
+
+After the filter type array follows the actual pixel data, encoded as
+follows:
+
+Every pixel must carry data in the format referenced by the image
+section that this section is contained in.
+
+Pixels are arranged and packed as follows:
+
+Pixels are packed in one of three ways, depending on whether the pixel
+format contains any 1-bit or 4-bit integer channels.
+
+If the pixel format contains at least one 1-bit channel, pixels are
+encoded in groups of eight. The data of 1-bit channels is encoded first,
+packed into bytes, in the order specified in the pixel format. Then
+follow any 4-bit channels, if present, also packed into bytes, in the
+order specified in the pixel format. Lastly follow all other channels,
+in the order specified in the pixel format.
+
+When packing, pixels in the group are ordered left to right from the
+most significant to the least significant bits in the byte.
+
+Multi-byte values must be in the byte order specified by the endian
+marker in the file signature.
+
+If the frame width is not a multiple of eight, the values of the
+remaining pixels in the last group of the scanline are undefined.
+
+For example, every group of eight pixels in a frame using a pixel format
+that defines, in this order, 4-bit red (R), 4-bit green (G), 4-bit blue
+(B), 1-bit alpha (A), 1-bit stencil (X), and 8-bit depth (Z), will be
+encoded as follows:
+
+Byte #:  |-Byte 0-||-Byte 1-||-Byte 2-||-Byte 3-||-Byte 4-||-Byte 5-|
+Channel:  AAAAAAAA  XXXXXXXX  RRRRRRRR  RRRRRRRR  RRRRRRRR  RRRRRRRR
+Pixel #:  01234567  01234567  00001111  22223333  44445555  66667777
+
+Byte #:  |-Byte 6-||-Byte 7-||-Byte 8-||-Byte 9-||-Byte 10||-Byte 11|
+Channel:  GGGGGGGG  GGGGGGGG  GGGGGGGG  GGGGGGGG  BBBBBBBB  BBBBBBBB
+Pixel #:  00001111  22223333  44445555  66667777  00001111  22223333
+
+Byte #:  |-Byte 12||-Byte 13||-Byte 14||-Byte 15||-Byte 16||-Byte 17|
+Channel:  BBBBBBBB  BBBBBBBB  ZZZZZZZZ  ZZZZZZZZ  ZZZZZZZZ  ZZZZZZZZ
+Pixel #:  44445555  66667777  00000000  11111111  22222222  33333333
+
+Byte #:  |-Byte 12||-Byte 13||-Byte 14||-Byte 15|
+Channel:  ZZZZZZZZ  ZZZZZZZZ  ZZZZZZZZ  ZZZZZZZZ
+Pixel #:  44444444  55555555  66666666  77777777
+
+If the pixel format does not contain any 1-bit channels but contains
+4-bit channels, then the pixels are encoded in consecutive pairs. First,
+the data of each 4-bit channel is packed into bytes, in the channel
+order specified in the pixel format. Then follow all other channels.
+
+When packing, pixels are ordered left to right from the most significant
+to the least significant bits in the byte.
+
+Multi-byte values must be in the byte order specified by the endian
+marker in the file signature.
+
+If the width of the frame is not an even number, then the values of the
+second pixel in the last pair is undefined.
+
+For example, every pixel pair in a frame using a pixel format that
+defines, in this order, 16-bit alpha (A), 4-bit red (R), 4-bit green
+(G), 4-bit blue (B), and 8-bit depth (Z), will be encoded as follows:
+
+Byte #:  |-Byte 0-||-Byte 1-||-Byte 2-||-Byte 3-||-Byte 4-||-Byte 5-|
+Channel:  RRRRRRRR  GGGGGGGG  BBBBBBBB  AAAAAAAA  AAAAAAAA  AAAAAAAA
+Pixel #:  00001111  00001111  00001111  00000000  00000000  11111111
+
+Byte #:  |-Byte 6-||-Byte 7-||-Byte 8-|
+Channel:  AAAAAAAA  ZZZZZZZZ  ZZZZZZZZ
+Pixel #:  11111111  00000000  11111111
+
+If the pixel format contains neither 1-bit nor 4-bit channels, then
+pixels are encoded individually, in order, with channels in the order
+specified in the pixel format.
+
+Multi-byte values must be in the byte order specified by the endian
+marker in the file signature.
+
+The actual values of each channel in each pixel are determined by the
+filtering algorithm used. Every row of pixels can use a different
+filtering algorithm, as indicated by the corresponding element in the
+filter type array preceding the pixel data in the keyframe. The
+following filter type values are defined:
+
+	Value	Meaning
+	0x00	None
+	0x01	Delta left
+	0x02	Delta up
+	0x03	Delta diagonal
+	0x04	Delta max
+	0x05	Average 2
+	0x06	Average 3
+	0x07	Paeth
+	0x08-0x7F	Reserved for future standard use
+	0x80-0xFF	Private use
+
+Filtering is applied per-channel (not per-byte!), using arithmetic
+appropriate to the channel's data type.
+
+The standard filtering algorithms are defined as follows:
+
+	Algo	Value
+	0x00	0
+	0x01	L
+	0x02	U
+	0x03	D
+	0x04	min(L, U, D)
+	0x05	median(L, U, D)
+	0x06	max(L, U, D)
+	0x07	(L + U) / 2
+	0x08	(L + U + D) / 3
+	0x09	paeth(L, U, D)
+
+where L is the value of the corresponding channel in the pixel to the
+left of the current pixel, U is the value of the corresponding channel
+in the pixel above the current pixel, and D is the value of the
+corresponding channel in the pixel diagonally up and left of the current
+pixel.
+
+During encoding, the value calculated above is subtracted from the
+original value of each channel in the current pixel. During decoding, it
+is added to the filtered value in the datastream to restore the original
+value as it was before encoding.
+
+All of the above filters are fully lossless for all integer channel
+types. For floating point channel types, filters other than 0x00 could
+result in losses due to rounding imprecisions.
+
+The filter type array and the filtered pixel data are then compressed as
+a single solid chunk using the algorithm specified in the image section
+that contains the keyframe section.
 
 
 ## Standard Optional Sections
@@ -526,9 +765,86 @@ software that was used to encode the actual file.
 // TODO
 
 
-### Section 0x04: Frame
+### Section 0x04: Delta Frame
 
-// TODO
+This section type contains pixel data for an animated image, encoded in
+a way that improves data compression, but depends on the previous frame
+of the animation to be decoded before it. Therefore, it is not possible
+to skip to such a frame during playback without first decoding all
+previous frames, starting from the nearest keyframe.
+
+This section can only be contained inside sections of type 0x83 (Image),
+and only if there is at least one section of type 0x84 (Keyframe) before
+it, in the same image section.
+
+Delta frame sections have the following syntax:
+
+	Size	Value
+	1 byte	0x04
+	4 bytes	length of remainder of section
+	2 bytes	frame duration in microseconds
+	2 bytes x-offset
+	2 bytes y-offset
+	2 bytes frame width
+	2 bytes frame height
+	... compressed datastream ...
+
+This section is very similar to 0x84 (Keyframe), and will be specified
+as a set of differences from it. Please refer to the specification for
+0x84 (Keyframe) as you read the text below.
+
+Unlike 0x84 (Keyframe), this section can encode only a sub-rectangle of
+the entire image, if only part of the image changes during the current
+animation frame. This can improve compression by not reencoding large
+areas of pixels that remain unchanged between frames. On playback, the
+decoded value of each channel of each pixel in the frame must overwrite
+the value of the corresponding channel of the corresponding pixel
+already displayed from frames prior. Pixels outside of the rectangle
+defined for this frame must remain untouched.
+
+Bytes 7-14 of the section header represent the x coordinate, y
+coordinate, width, and height, in this order, of the rectangle within
+the entire image that the frame encodes. x+width must not exceed the
+width of the entire image and y+height must not exceed the height of the
+entire image. These coordinates are measured from left to right (x) and
+from top to bottom (y).
+
+Bytes 1-4 are the mandatory section length as required by all optional
+section types.
+
+Bytes 5-6 represent the frame duration, in a manner identical to 0x84
+(Keyframe).
+
+The compressed datastream is produced in a manner identical to 0x84
+(Keyframe), with the following differences:
+
+The number of scanlines encoded is equal to the height specified in this
+section's header, as opposed to the height of the entire image. Hence
+there are only that many values in the filter type array preceding the
+pixel data.
+
+Similarly, the number of pixels in each scanline is equal to the width
+specified in this section's header, as opposed to the width of the
+entire image.
+
+Additionally, when applying filtering, the input to the algorithm is the
+difference between the current pixel's channels and the channels of the
+corresponding pixel in the previous frame. Thus, this section encodes
+deltas from the previous frame rather than the actual pixels. This
+acts as an additional filter step to improve compressability.
+
+Note that these deltas are calculated between the actual values of
+pixels between this animation frame and the previous animation frame.
+Hence, if the previous frame was also encoded as a section of type 0x04
+(Delta Frame), the current frame's deltas must be calculated as
+differences from the actual values of the previous frame's pixels, and
+not from the deltas that were encoded into it.
+
+Similarly, if the previous frame was also encoded as a section of type
+0x04 (Delta Frame), and its crop rectangle is smaller than that of the
+current frame, the deltas are calculated as differences from the last
+known values of the pixels, from whatever the most recent frame that
+encoced them was.
 
 
 ### Section 0x05: Gamma Correction Information
