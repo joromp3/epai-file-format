@@ -10,7 +10,7 @@
 #include "epai.h"
 
 
-extern int epai_metadata_validate_key_string(const epai_byte_t* key, uint32_t len) {
+extern int epai_metadata_validate_key_string(const char* key, uint32_t len) {
 	int i;
 
 	for (i = 0; i < len; ++i) {
@@ -95,8 +95,8 @@ extern epai_error_t epai_metadata_new_struct(epai_metadata_section_t** ssp) {
 
 	ns->keylens = calloc(EPAI_METADATA_MAX_PAIRS, sizeof(int));
 	ns->vallens = calloc(EPAI_METADATA_MAX_PAIRS, sizeof(int));
-	ns->keys = calloc(EPAI_METADATA_MAX_PAIRS, sizeof(epai_byte_t*));
-	ns->values = calloc(EPAI_METADATA_MAX_PAIRS, sizeof(epai_byte_t*));
+	ns->keys = calloc(EPAI_METADATA_MAX_PAIRS, sizeof(char*));
+	ns->values = calloc(EPAI_METADATA_MAX_PAIRS, sizeof(char*));
 
 	if (ns->keylens == NULL ||
 	    ns->vallens == NULL ||
@@ -124,7 +124,7 @@ extern epai_error_t epai_metadata_new_struct(epai_metadata_section_t** ssp) {
 }
 
 extern epai_error_t epai_metadata_add_pair(epai_metadata_section_t* ssp,
-		const epai_byte_t* key, const epai_byte_t* value) {
+		const char* key, const char* value) {
 	int keylen = strlen(key);
 	int vallen = strlen(value);
 
@@ -156,7 +156,7 @@ extern epai_error_t epai_metadata_add_pair(epai_metadata_section_t* ssp,
 
 extern epai_error_t epai_metadata_remove_pair_by_index(epai_metadata_section_t* ssp,
 		int index) {
-	epai_byte_t *tempk, *tempv;
+	char *tempk, *tempv;
 	int i;
 
 	if (index >= ssp->num_pairs ||

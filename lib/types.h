@@ -5,6 +5,7 @@
 #ifndef LIBEPAI_TYPES_H
 #define LIBEPAI_TYPES_H
 
+/* to be used for byte buffers; text strings should use regular char type */
 typedef unsigned char epai_byte_t;
 
 typedef enum {
