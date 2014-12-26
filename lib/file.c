@@ -37,7 +37,7 @@ extern epai_error_t epai_file_new(epai_file_t** efp, epai_endian_t endian) {
 
 	err = epai_file_signature_new_struct(&(nf->sections[0]));
 
-	if (err) {
+	if (err != EPAI_SUCCESS) {
 		free(nf->sections);
 		free(nf);
 		return err;

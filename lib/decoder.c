@@ -22,7 +22,7 @@ extern epai_error_t epai_decoder_new_from_ptr(epai_decoder_t** ds,
 	}
 
 	err = epai_file_new(&ns->file, EPAI_ENDIAN_LITTLE);
-	if (err) {
+	if (err != EPAI_SUCCESS) {
 		free(ns);
 		return err;
 	}
@@ -50,7 +50,7 @@ extern epai_error_t epai_decoder_decode(epai_decoder_t* ds) {
 	err = epai_file_signature_parse_blob(&ds->file->sections[0],
 			sp, sec_len);
 
-	if (err) {
+	if (err != EPAI_SUCCESS) {
 		return err;
 	}
 
@@ -64,12 +64,12 @@ extern epai_error_t epai_decoder_decode(epai_decoder_t* ds) {
 		}
 
 		err = epai_section_parse_blob(&sec, sp, sec_len);
-		if (err) {
+		if (err != EPAI_SUCCESS) {
 			return err;
 		}
 
 		err = epai_file_add_section(ds->file, sec);
-		if (err) {
+		if (err != EPAI_SUCCESS) {
 			return err;
 		}
 

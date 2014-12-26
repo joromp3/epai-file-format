@@ -70,16 +70,16 @@ extern epai_error_t epai_file_signature_validate_blob(const epai_byte_t* buffer,
 
 extern epai_error_t epai_file_signature_parse_blob(epai_fsign_section_t** ssp,
 		const epai_byte_t* buffer, uint32_t len) {
-	epai_error_t error = epai_file_signature_validate_blob(buffer, len);
+	epai_error_t err = epai_file_signature_validate_blob(buffer, len);
 
-	if (error) {
-		return error;
+	if (err != EPAI_SUCCESS) {
+		return err;
 	}
 
-	error = epai_file_signature_new_struct(ssp);
+	err = epai_file_signature_new_struct(ssp);
 
-	if (error) {
-		return error;
+	if (err != EPAI_SUCCESS) {
+		return err;
 	}
 
 	return EPAI_SUCCESS;
@@ -121,14 +121,14 @@ extern epai_error_t epai_file_signature_fill_blob(const epai_fsign_section_t* ss
 extern epai_error_t epai_file_signature_new_blob(const epai_fsign_section_t* ssp,
 		epai_byte_t** out, uint32_t* len) {
 	epai_byte_t* r = malloc(file_signature_header_len);
-	epai_error_t error;
+	epai_error_t err;
 
 	if (r == NULL) {
-		error = EPAI_ERROR_MALLOC;
+		err = EPAI_ERROR_MALLOC;
 	} else {
-		error = epai_file_signature_fill_blob(ssp, r,
+		err = epai_file_signature_fill_blob(ssp, r,
 				file_signature_header_len);
-		if (error == EPAI_SUCCESS) {
+		if (err == EPAI_SUCCESS) {
 			*out = r;
 			*len = file_signature_header_len;
 		} else {
@@ -136,5 +136,5 @@ extern epai_error_t epai_file_signature_new_blob(const epai_fsign_section_t* ssp
 		}
 	}
 
-	return error;
+	return err;
 }

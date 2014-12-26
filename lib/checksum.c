@@ -65,10 +65,10 @@ extern epai_error_t epai_checksum_new_struct(epai_checksum_section_t** ssp) {
 
 
 extern epai_error_t epai_checksum_validate_blob(const epai_byte_t* buffer, uint32_t len) {
-	epai_error_t error = epai_validate_optional_section_blob(buffer, len);
+	epai_error_t err = epai_validate_optional_section_blob(buffer, len);
 
-	if (error) {
-		return error;
+	if (err != EPAI_SUCCESS) {
+		return err;
 	}
 
 	if (*buffer != EPAI_SECTION_CHECKSUM) {
@@ -81,17 +81,17 @@ extern epai_error_t epai_checksum_validate_blob(const epai_byte_t* buffer, uint3
 
 extern epai_error_t epai_checksum_parse_blob(epai_checksum_section_t** ssp,
 		const epai_byte_t* buffer, uint32_t len) {
-	epai_error_t error = epai_checksum_validate_blob(buffer, len);
+	epai_error_t err = epai_checksum_validate_blob(buffer, len);
 
-	if (error) {
-		return error;
+	if (err != EPAI_SUCCESS) {
+		return err;
 	}
 
-	error = epai_checksum_new_struct(ssp);
+	err = epai_checksum_new_struct(ssp);
 	(*ssp)->length = len;
 
-	if (error) {
-		return error;
+	if (err != EPAI_SUCCESS) {
+		return err;
 	}
 
 	return EPAI_SUCCESS;
@@ -130,13 +130,13 @@ extern epai_error_t epai_checksum_fill_blob(const epai_checksum_section_t* ssp,
 extern epai_error_t epai_checksum_new_blob(const epai_checksum_section_t* ssp,
 		epai_byte_t** out, uint32_t* len) {
 	epai_byte_t* r = malloc(ssp->length);
-	epai_error_t error;
+	epai_error_t err;
 
 	if (r == NULL) {
-		error = EPAI_ERROR_MALLOC;
+		err = EPAI_ERROR_MALLOC;
 	} else {
-		error = epai_checksum_fill_blob(ssp, r, ssp->length);
-		if (error == EPAI_SUCCESS) {
+		err = epai_checksum_fill_blob(ssp, r, ssp->length);
+		if (err == EPAI_SUCCESS) {
 			*out = r;
 			*len = ssp->length;
 		} else {
@@ -144,5 +144,5 @@ extern epai_error_t epai_checksum_new_blob(const epai_checksum_section_t* ssp,
 		}
 	}
 
-	return error;
+	return err;
 }
