@@ -9,7 +9,7 @@
 #include "epai.h"
 
 
-extern epai_error_t epai_validate_optional_section_blob(const char* buffer,
+extern epai_error_t epai_validate_optional_section_blob(const epai_byte_t* buffer,
 							uint32_t len) {
 	uint32_t inner_len;
 
@@ -32,7 +32,7 @@ extern epai_error_t epai_validate_optional_section_blob(const char* buffer,
 }
 
 
-extern uint32_t epai_optional_section_parse_length(const char* buffer) {
+extern uint32_t epai_optional_section_parse_length(const epai_byte_t* buffer) {
 	/* FIXME endian */
 	return *(uint32_t*)(buffer + 1);
 }
@@ -74,7 +74,7 @@ extern epai_error_t epai_section_new_struct(epai_section_t** ssp,
 	}
 }
 
-extern epai_error_t epai_section_validate_blob(const char* buffer, uint32_t len) {
+extern epai_error_t epai_section_validate_blob(const epai_byte_t* buffer, uint32_t len) {
 	switch (*buffer) {
 	case EPAI_SECTION_FILE_SIGNATURE:
 		return epai_file_signature_validate_blob(buffer, len);
@@ -92,7 +92,7 @@ extern epai_error_t epai_section_validate_blob(const char* buffer, uint32_t len)
 }
 
 extern epai_error_t epai_section_parse_blob(epai_section_t** ssp,
-		const char* buffer, uint32_t len) {
+		const epai_byte_t* buffer, uint32_t len) {
 	switch (*buffer) {
 	case EPAI_SECTION_FILE_SIGNATURE:
 		return epai_file_signature_parse_blob(ssp, buffer, len);
@@ -106,7 +106,7 @@ extern epai_error_t epai_section_parse_blob(epai_section_t** ssp,
 }
 
 extern epai_error_t epai_section_fill_blob(const epai_section_t* ssp,
-		char* buffer, uint32_t len) {
+		epai_byte_t* buffer, uint32_t len) {
 	switch (ssp->type) {
 	case EPAI_SECTION_FILE_SIGNATURE:
 		return epai_file_signature_fill_blob(ssp, buffer, len);
@@ -120,7 +120,7 @@ extern epai_error_t epai_section_fill_blob(const epai_section_t* ssp,
 }
 
 extern epai_error_t epai_section_new_blob(const epai_section_t* ssp,
-		char** buffer, uint32_t* len) {
+		epai_byte_t** buffer, uint32_t* len) {
 	switch (ssp->type) {
 	case EPAI_SECTION_FILE_SIGNATURE:
 		return epai_file_signature_new_blob(ssp, buffer, len);
@@ -133,7 +133,7 @@ extern epai_error_t epai_section_new_blob(const epai_section_t* ssp,
 	}
 }
 
-extern uint32_t epai_section_parse_length(const char* buffer) {
+extern uint32_t epai_section_parse_length(const epai_byte_t* buffer) {
 	switch (*buffer) {
 	case EPAI_SECTION_FILE_SIGNATURE:
 		return epai_file_signature_parse_length(buffer);

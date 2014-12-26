@@ -13,7 +13,7 @@ extern void epai_decoder_free(epai_decoder_t* ds) {
 }
 
 extern epai_error_t epai_decoder_new_from_ptr(epai_decoder_t** ds,
-		const char* pin, size_t len) {
+		const epai_byte_t* pin, size_t len) {
 	epai_decoder_t* ns = malloc(sizeof(*ns));
 	epai_error_t err;
 
@@ -38,7 +38,7 @@ extern epai_error_t epai_decoder_new_from_ptr(epai_decoder_t** ds,
 extern epai_error_t epai_decoder_decode(epai_decoder_t* ds) {
 	epai_error_t err;
 	uint32_t sec_len, total_len = ds->buf_len;
-	const char *sp = ds->ptr_in;
+	const epai_byte_t *sp = ds->ptr_in;
 	epai_section_t* sec;
 
 	sec_len = epai_file_signature_parse_length(sp);

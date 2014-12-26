@@ -5,6 +5,8 @@
 #ifndef LIBEPAI_TYPES_H
 #define LIBEPAI_TYPES_H
 
+typedef unsigned char epai_byte_t;
+
 typedef enum {
 	/* No error. */
 	EPAI_SUCCESS = 0,

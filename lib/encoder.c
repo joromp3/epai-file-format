@@ -41,9 +41,10 @@ extern epai_error_t epai_encoder_new(epai_encoder_t** es, epai_file_t* f) {
 	return EPAI_SUCCESS;
 }
 
-extern epai_error_t epai_encoder_encode_to_ptr(const epai_decoder_t* es, char** pout) {
+extern epai_error_t epai_encoder_encode_to_ptr(const epai_decoder_t* es,
+		epai_byte_t** pout) {
 	size_t total_len = 0;
-	char* aout, cp;
+	epai_byte_t *aout, *cp;
 	epai_error_t err;
 	int i;
 

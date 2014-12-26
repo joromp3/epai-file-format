@@ -28,13 +28,13 @@ extern epai_error_t epai_file_signature_new_struct(epai_fsign_section_t** ssp) {
 		return EPAI_ERROR_MALLOC;
 	}
 
-	(*ssp)->type = EPAI_SECTION_PADDING;
+	(*ssp)->type = EPAI_SECTION_FILE_SIGNATURE;
 
 	return EPAI_SUCCESS;
 }
 
 
-extern epai_error_t epai_file_signature_validate_blob(const char* buffer,
+extern epai_error_t epai_file_signature_validate_blob(const epai_byte_t* buffer,
 						      uint32_t len) {
 	unsigned int endian_marker;
 
@@ -69,7 +69,7 @@ extern epai_error_t epai_file_signature_validate_blob(const char* buffer,
 
 
 extern epai_error_t epai_file_signature_parse_blob(epai_fsign_section_t** ssp,
-		const char* buffer, uint32_t len) {
+		const epai_byte_t* buffer, uint32_t len) {
 	epai_error_t error = epai_file_signature_validate_blob(buffer, len);
 
 	if (error) {
@@ -86,7 +86,7 @@ extern epai_error_t epai_file_signature_parse_blob(epai_fsign_section_t** ssp,
 }
 
 
-extern uint32_t epai_file_signature_parse_length(const char* buffer) {
+extern uint32_t epai_file_signature_parse_length(const epai_byte_t* buffer) {
 	return file_signature_header_len;
 }
 
@@ -96,7 +96,7 @@ extern uint32_t epai_file_signature_encode_length(const epai_fsign_section_t* ss
 
 
 extern epai_error_t epai_file_signature_fill_blob(const epai_fsign_section_t* ssp,
-		char* buffer, uint32_t len) {
+		epai_byte_t* buffer, uint32_t len) {
 
 	if (len != file_signature_header_len) {
 		return EPAI_ERROR_SECTION_LENGTH;
@@ -119,8 +119,8 @@ extern epai_error_t epai_file_signature_fill_blob(const epai_fsign_section_t* ss
 }
 
 extern epai_error_t epai_file_signature_new_blob(const epai_fsign_section_t* ssp,
-		char** out, uint32_t* len) {
-	char* r = malloc(file_signature_header_len);
+		epai_byte_t** out, uint32_t* len) {
+	epai_byte_t* r = malloc(file_signature_header_len);
 	epai_error_t error;
 
 	if (r == NULL) {

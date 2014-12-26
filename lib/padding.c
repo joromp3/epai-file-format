@@ -27,7 +27,7 @@ extern epai_error_t epai_padding_new_struct(epai_padding_section_t** ssp) {
 }
 
 
-extern epai_error_t epai_padding_validate_blob(const char* buffer, uint32_t len) {
+extern epai_error_t epai_padding_validate_blob(const epai_byte_t* buffer, uint32_t len) {
 	int i;
 
 	epai_error_t error = epai_validate_optional_section_blob(buffer, len);
@@ -51,7 +51,7 @@ extern epai_error_t epai_padding_validate_blob(const char* buffer, uint32_t len)
 
 
 extern epai_error_t epai_padding_parse_blob(epai_padding_section_t** ssp,
-		const char* buffer, uint32_t len) {
+		const epai_byte_t* buffer, uint32_t len) {
 	epai_error_t error = epai_padding_validate_blob(buffer, len);
 
 	if (error) {
@@ -69,7 +69,7 @@ extern epai_error_t epai_padding_parse_blob(epai_padding_section_t** ssp,
 }
 
 
-extern uint32_t epai_padding_parse_length(const char* buffer) {
+extern uint32_t epai_padding_parse_length(const epai_byte_t* buffer) {
 	/* FIXME endian */
 	return *(uint32_t*)(buffer + 1);
 }
@@ -80,7 +80,7 @@ extern uint32_t epai_padding_encode_length(const epai_padding_section_t* ssp) {
 
 
 extern epai_error_t epai_padding_fill_blob(const epai_padding_section_t* ssp,
-		char* buffer, uint32_t len) {
+		epai_byte_t* buffer, uint32_t len) {
 	int i;
 
 	if (ssp->length < 5 || len != ssp->length) {
@@ -100,8 +100,8 @@ extern epai_error_t epai_padding_fill_blob(const epai_padding_section_t* ssp,
 }
 
 extern epai_error_t epai_padding_new_blob(const epai_padding_section_t* ssp,
-		char** out, uint32_t* len) {
-	char* r = malloc(ssp->length);
+		epai_byte_t** out, uint32_t* len) {
+	epai_byte_t* r = malloc(ssp->length);
 	epai_error_t error;
 
 	if (r == NULL) {

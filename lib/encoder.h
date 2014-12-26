@@ -19,7 +19,7 @@ extern void epai_encoder_free(epai_encoder_t*, int);
 extern epai_error_t epai_encoder_new(epai_encoder_t**, epai_file_t*);
 
 /* actually perform encoding process */
-extern epai_error_t epai_encoder_encode_to_ptr(const epai_decoder_t*, char**);
+extern epai_error_t epai_encoder_encode_to_ptr(const epai_decoder_t*, epai_byte_t**);
 
 
 #endif /* LIBEPAI_ENCODER_H */

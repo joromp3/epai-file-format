@@ -35,7 +35,7 @@ extern epai_error_t epai_file_new(epai_file_t** efp, epai_endian_t endian) {
 		return EPAI_ERROR_MALLOC;
 	}
 
-	err = epai_file_signature_new_struct(nf->sections[0]);
+	err = epai_file_signature_new_struct(&(nf->sections[0]));
 
 	if (err) {
 		free(nf->sections);

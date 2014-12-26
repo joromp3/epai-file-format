@@ -18,22 +18,22 @@ extern void epai_file_signature_free_struct(epai_fsign_section_t*);
 extern epai_error_t epai_file_signature_new_struct(epai_fsign_section_t**);
 
 /* validate a binary blob of encoded file signature data */
-extern epai_error_t epai_file_signature_validate_blob(const char*, uint32_t);
+extern epai_error_t epai_file_signature_validate_blob(const epai_byte_t*, uint32_t);
 
 /* parse a binary blob of encoded file signature data into a new struct */
 extern epai_error_t epai_file_signature_parse_blob(epai_fsign_section_t**,
-		const char*, uint32_t);
+		const epai_byte_t*, uint32_t);
 
 /* encode a file signature into an existing buffer */
 extern epai_error_t epai_file_signature_fill_blob(const epai_fsign_section_t*,
-		char*, uint32_t);
+		epai_byte_t*, uint32_t);
 
 /* allocate a new buffer and encode a file signature into it */
 extern epai_error_t epai_file_signature_new_blob(const epai_fsign_section_t*,
-		char**, uint32_t*);
+		epai_byte_t**, uint32_t*);
 
 /* return the length of the encoded file signature section at pointer */
-extern uint32_t epai_file_signature_parse_length(const char*);
+extern uint32_t epai_file_signature_parse_length(const epai_byte_t*);
 
 /* return the length needed to encode file signature */
 extern uint32_t epai_file_signature_encode_length(const epai_fsign_section_t*);
