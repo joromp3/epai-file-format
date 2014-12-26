@@ -40,7 +40,7 @@ extern epai_error_t epai_validate_optional_section_blob(const epai_byte_t* buffe
 
 extern uint32_t epai_optional_section_parse_length(const epai_byte_t* buffer) {
 	/* FIXME endian */
-	return *(uint32_t*)(buffer + 1);
+	return *(uint32_t*)(buffer + 1) + 5;
 }
 
 extern uint32_t epai_optional_section_encode_length(const epai_optional_section_t* ssp) {

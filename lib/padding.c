@@ -75,7 +75,7 @@ extern epai_error_t epai_padding_parse_blob(epai_padding_section_t** ssp,
 
 extern uint32_t epai_padding_parse_length(const epai_byte_t* buffer) {
 	/* FIXME endian */
-	return *(uint32_t*)(buffer + 1);
+	return *(uint32_t*)(buffer + 1) + 5;
 }
 
 extern uint32_t epai_padding_encode_length(const epai_padding_section_t* ssp) {
