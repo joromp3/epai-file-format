@@ -17,6 +17,7 @@ extern void epai_padding_free_struct(epai_padding_section_t* ssp) {
 extern epai_error_t epai_padding_new_struct(epai_padding_section_t** ssp) {
 	*ssp = malloc(sizeof(**ssp));
 	if (*ssp == NULL) {
+		epai_set_error("Could not allocate memory for new padding struct.");
 		return EPAI_ERROR_MALLOC;
 	}
 
@@ -37,11 +38,14 @@ extern epai_error_t epai_padding_validate_blob(const epai_byte_t* buffer, uint32
 	}
 
 	if (*buffer != EPAI_SECTION_PADDING) {
+		epai_set_error("Could not validate section blob: "
+				"section type code byte is not Padding.");
 		return EPAI_ERROR_SECTION_TYPE;
 	}
 
 	for (i = 5; i < len; ++i) {
 		if (buffer[i] != 0) {
+			epai_set_error("Invalid section blob: nonzero padding.");
 			return EPAI_ERROR_NONZERO_PADDING;
 		}
 	}
@@ -84,6 +88,13 @@ extern epai_error_t epai_padding_fill_blob(const epai_padding_section_t* ssp,
 	int i;
 
 	if (ssp->length < 5 || len != ssp->length) {
+		epai_set_error("Padding must be at least 5 bytes long.");
+		return EPAI_ERROR_SECTION_LENGTH;
+	}
+
+	if (len < ssp->length) {
+		epai_set_error("Cannot fill buffer with padding blob: "
+				"buffer too short.");
 		return EPAI_ERROR_SECTION_LENGTH;
 	}
 
@@ -105,6 +116,7 @@ extern epai_error_t epai_padding_new_blob(const epai_padding_section_t* ssp,
 	epai_error_t err;
 
 	if (r == NULL) {
+		epai_set_error("Could not allocate memory for new padding blob.");
 		err = EPAI_ERROR_MALLOC;
 	} else {
 		err = epai_padding_fill_blob(ssp, r, ssp->length);

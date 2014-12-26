@@ -22,6 +22,7 @@ extern epai_error_t epai_file_new(epai_file_t** efp, epai_endian_t endian) {
 
 	nf = malloc(sizeof(*nf));
 	if (nf == NULL) {
+		epai_set_error("Could not allocate memory for new file struct.");
 		return EPAI_ERROR_MALLOC;
 	}
 
@@ -31,6 +32,7 @@ extern epai_error_t epai_file_new(epai_file_t** efp, epai_endian_t endian) {
 	nf->sections = malloc(sizeof(*(nf->sections)));
 
 	if (nf->sections == NULL) {
+		epai_set_error("Could not allocate memory for file section array.");
 		free(nf);
 		return EPAI_ERROR_MALLOC;
 	}
@@ -52,6 +54,8 @@ extern epai_error_t epai_file_add_section(epai_file_t* efp, epai_section_t* ssp)
 	epai_section_t** tmp = realloc(efp->sections,
 			(efp->num_sections + 1) * sizeof(*(efp->sections)));
 	if (tmp == NULL) {
+		epai_set_error("Could not expand memory allocation for "
+				"file section array.");
 		return EPAI_ERROR_MALLOC;
 	}
 

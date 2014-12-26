@@ -25,6 +25,7 @@ extern void epai_file_signature_free_struct(epai_fsign_section_t* ssp) {
 extern epai_error_t epai_file_signature_new_struct(epai_fsign_section_t** ssp) {
 	*ssp = malloc(sizeof(**ssp));
 	if (*ssp == NULL) {
+		epai_set_error("Could not allocate memory for new file signature struct.");
 		return EPAI_ERROR_MALLOC;
 	}
 
@@ -39,20 +40,25 @@ extern epai_error_t epai_file_signature_validate_blob(const epai_byte_t* buffer,
 	unsigned int endian_marker;
 
 	if (len != file_signature_header_len) {
+		epai_set_error("Invalid blob length for file signature.");
 		return EPAI_ERROR_SECTION_LENGTH;
 	}
 
 	if (*buffer != EPAI_SECTION_FILE_SIGNATURE) {
+		epai_set_error("Could not validate section blob: "
+				"section type code byte is not File Signature.");
 		return EPAI_ERROR_SECTION_TYPE;
 	}
 
 	if (*++buffer != 'E' || *++buffer != 'P' ||
 	    *++buffer != 'A' || *++buffer != 'I' ||
 	    *++buffer != 0x0d || *++buffer != 0x0a || *++buffer != 0x0a) {
+		epai_set_error("Invalid file signature header; blob likely corrupt.");
 		return EPAI_ERROR_BAD_FILE_SIGNATURE;
 	}
 
 	if (*++buffer > max_format_version) {
+		epai_set_error("Unsupported blob file format version.");
 		return EPAI_ERROR_VERSION_UNSUPPORTED;
 	}
 
@@ -61,6 +67,7 @@ extern epai_error_t epai_file_signature_validate_blob(const epai_byte_t* buffer,
 
 	/* Validation should pass regardless of file endian. */
 	if (!(endian_marker == 0xAF00 || endian_marker == 0x00AF)) {
+		epai_set_error("Invalid endian marker in file signature blob.");
 		return EPAI_ERROR_BAD_FILE_SIGNATURE;
 	}
 
@@ -98,7 +105,9 @@ extern uint32_t epai_file_signature_encode_length(const epai_fsign_section_t* ss
 extern epai_error_t epai_file_signature_fill_blob(const epai_fsign_section_t* ssp,
 		epai_byte_t* buffer, uint32_t len) {
 
-	if (len != file_signature_header_len) {
+	if (len < file_signature_header_len) {
+		epai_set_error("Could not fill buffer with file signature blob: "
+				"buffer too short.");
 		return EPAI_ERROR_SECTION_LENGTH;
 	}
 
@@ -124,6 +133,7 @@ extern epai_error_t epai_file_signature_new_blob(const epai_fsign_section_t* ssp
 	epai_error_t err;
 
 	if (r == NULL) {
+		epai_set_error("Could not allocate memory for new file signature blob.");
 		err = EPAI_ERROR_MALLOC;
 	} else {
 		err = epai_file_signature_fill_blob(ssp, r,

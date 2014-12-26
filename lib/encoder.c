@@ -31,6 +31,7 @@ extern epai_error_t epai_encoder_new(epai_encoder_t** es, epai_file_t* f) {
 		if (f == NULL) {
 			epai_file_free(nf);
 		}
+		epai_set_error("Could not allocate memory for new encoder struct.");
 		return EPAI_ERROR_MALLOC;
 	}
 
@@ -54,6 +55,8 @@ extern epai_error_t epai_encoder_encode_to_ptr(const epai_decoder_t* es,
 
 	aout = malloc(total_len);
 	if (aout == NULL) {
+		epai_set_error("Encoding failed: could not allocate memory "
+				"for output buffer.");
 		return EPAI_ERROR_MALLOC;
 	}
 

@@ -8,33 +8,6 @@
 typedef unsigned char epai_byte_t;
 
 typedef enum {
-	/* No error. */
-	EPAI_SUCCESS = 0,
-	/* Undefined error (!EPAI_SUCCESS). */
-	EPAI_ERROR_UNSPECIFIED,
-	/* Out of memory. */
-	EPAI_ERROR_MALLOC,
-	/* Invalid operation. */
-	EPAI_ERROR_BAD_OPERATION,
-	/* Problem with file I/O. */
-	EPAI_ERROR_FILEIO,
-	/* Bad section type code. */
-	EPAI_ERROR_SECTION_TYPE,
-	/* Bad section length. */
-	EPAI_ERROR_SECTION_LENGTH,
-	/* Corrupt file signature. */
-	EPAI_ERROR_BAD_FILE_SIGNATURE,
-	/* Unsupported format version. */
-	EPAI_ERROR_VERSION_UNSUPPORTED,
-	/* Bad (nonzero) padding. */
-	EPAI_ERROR_NONZERO_PADDING,
-	/* Invalid metadata key string. */
-	EPAI_ERROR_METADATA_KEY,
-	/* Parts of metadata section exceed defined limits. */
-	EPAI_ERROR_METADATA_LIMITS
-} epai_error_t;
-
-typedef enum {
 	EPAI_ENDIAN_NATIVE,
 	EPAI_ENDIAN_LITTLE,
 	EPAI_ENDIAN_BIG

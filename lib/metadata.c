@@ -30,17 +30,20 @@ static epai_error_t epai_metadata_update_length(epai_metadata_section_t* ssp) {
 	int i;
 
 	if (ssp->num_pairs > EPAI_METADATA_MAX_PAIRS) {
+		epai_set_error("Too many metadata pairs.");
 		return EPAI_ERROR_METADATA_LIMITS;
 	}
 
 	for (i = 0; i < ssp->num_pairs; ++i) {
 		if (ssp->keylens[i] > EPAI_METADATA_KEY_LEN) {
+			epai_set_error("Metadata key too long.");
 			return EPAI_ERROR_METADATA_LIMITS;
 		}
 
 		l += ssp->keylens[i] + 1;
 
 		if (ssp->vallens[i] > EPAI_METADATA_VAL_LEN) {
+			epai_set_error("Metadata value too long.");
 			return EPAI_ERROR_METADATA_LIMITS;
 		}
 
@@ -82,6 +85,7 @@ extern epai_error_t epai_metadata_new_struct(epai_metadata_section_t** ssp) {
 
 	ns = malloc(sizeof(*ns));
 	if (ns == NULL) {
+		epai_set_error("Could not allocate memory for new metadata struct.");
 		return EPAI_ERROR_MALLOC;
 	}
 
@@ -98,6 +102,7 @@ extern epai_error_t epai_metadata_new_struct(epai_metadata_section_t** ssp) {
 	    ns->vallens == NULL ||
 	    ns->keys == NULL ||
 	    ns->values == NULL) {
+		epai_set_error("Could not allocate memory for metadata arrays.");
 		epai_metadata_free_struct(ns);
 		return EPAI_ERROR_MALLOC;
 	}
@@ -107,6 +112,8 @@ extern epai_error_t epai_metadata_new_struct(epai_metadata_section_t** ssp) {
 		ns->values[i] = malloc(EPAI_METADATA_VAL_LEN);
 
 		if (ns->keys[i] == NULL || ns->values[i] == NULL) {
+			epai_set_error("Could not allocate memory for "
+					"metadata string buffer.");
 			epai_metadata_free_struct(ns);
 			return EPAI_ERROR_MALLOC;
 		}
@@ -121,9 +128,19 @@ extern epai_error_t epai_metadata_add_pair(epai_metadata_section_t* ssp,
 	int keylen = strlen(key);
 	int vallen = strlen(value);
 
-	if (keylen > EPAI_METADATA_KEY_LEN ||
-	    vallen > EPAI_METADATA_VAL_LEN ||
-	    ssp->num_pairs >= EPAI_METADATA_MAX_PAIRS) {
+	if (keylen > EPAI_METADATA_KEY_LEN) {
+		epai_set_error("Could not add new metadata pair: "
+				"key too long.");
+		return EPAI_ERROR_METADATA_LIMITS;
+	}
+	if (vallen > EPAI_METADATA_VAL_LEN) {
+		epai_set_error("Could not add new metadata pair: "
+				"value too long.");
+		return EPAI_ERROR_METADATA_LIMITS;
+	}
+	if (ssp->num_pairs >= EPAI_METADATA_MAX_PAIRS) {
+		epai_set_error("Could not add new metadata pair: "
+				"no space left in array.");
 		return EPAI_ERROR_METADATA_LIMITS;
 	}
 
@@ -144,6 +161,8 @@ extern epai_error_t epai_metadata_remove_pair_by_index(epai_metadata_section_t* 
 
 	if (index >= ssp->num_pairs ||
 	    index < 0) {
+		epai_set_error("Could not remove metadata pair: "
+				"index invalid.");
 		return EPAI_ERROR_METADATA_LIMITS;
 	}
 
@@ -179,6 +198,8 @@ extern epai_error_t epai_metadata_validate_blob(const epai_byte_t* buffer,
 	}
 
 	if (*buffer != EPAI_SECTION_METADATA) {
+		epai_set_error("Could not validate section blob: "
+				"section type code byte is not Text Metadata.");
 		return EPAI_ERROR_SECTION_TYPE;
 	}
 
@@ -188,10 +209,14 @@ extern epai_error_t epai_metadata_validate_blob(const epai_byte_t* buffer,
 		keylen = strlen(buffer);
 
 		if (!epai_metadata_validate_key_string(buffer, keylen)) {
+			epai_set_error("Invalid section blob: "
+					"metadata key contains prohibited characters.");
 			return EPAI_ERROR_METADATA_KEY;
 		}
 
 		if (keylen >= EPAI_METADATA_KEY_LEN) {
+			epai_set_error("Invalid section blob: "
+					"metadata key too long.");
 			return EPAI_ERROR_METADATA_LIMITS;
 		}
 
@@ -199,6 +224,8 @@ extern epai_error_t epai_metadata_validate_blob(const epai_byte_t* buffer,
 		vallen = strlen(buffer);
 
 		if (vallen >= EPAI_METADATA_VAL_LEN) {
+			epai_set_error("Invalid section blob: "
+					"metadata value too long.");
 			return EPAI_ERROR_METADATA_LIMITS;
 		}
 
@@ -209,10 +236,14 @@ extern epai_error_t epai_metadata_validate_blob(const epai_byte_t* buffer,
 	} while (len > 5);
 
 	if (len != 5) { /* overread: last string ends past len. */
+		epai_set_error("Failed to validate section blob: "
+				"Section length in stream does not match.");
 		return EPAI_ERROR_SECTION_LENGTH;
 	}
 
 	if (npairs > EPAI_METADATA_MAX_PAIRS) {
+		epai_set_error("Invalid section blob: "
+				"too many metadata pairs.");
 		return EPAI_ERROR_METADATA_LIMITS;
 	}
 
@@ -267,7 +298,9 @@ extern epai_error_t epai_metadata_fill_blob(const epai_metadata_section_t* ssp,
 	epai_byte_t* out, uint32_t len) {
 	int i;
 
-	if (len != ssp->length) {
+	if (len < ssp->length) {
+		epai_set_error("Cannot fill buffer with metadata blob: "
+				"buffer too short.");
 		return EPAI_ERROR_SECTION_LENGTH;
 	}
 
@@ -293,6 +326,7 @@ extern epai_error_t epai_metadata_new_blob(const epai_metadata_section_t* ssp,
 
 	r = malloc(ssp->length);
 	if (r == NULL) {
+		epai_set_error("Could not allocate memory for new metadata blob.");
 		return EPAI_ERROR_MALLOC;
 	}
 

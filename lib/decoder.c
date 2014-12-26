@@ -18,6 +18,7 @@ extern epai_error_t epai_decoder_new_from_ptr(epai_decoder_t** ds,
 	epai_error_t err;
 
 	if (ns == NULL) {
+		epai_set_error("Could not allocate memory for new decoder struct.");
 		return EPAI_ERROR_MALLOC;
 	}
 
@@ -43,6 +44,8 @@ extern epai_error_t epai_decoder_decode(epai_decoder_t* ds) {
 
 	sec_len = epai_file_signature_parse_length(sp);
 	if (sec_len > total_len) {
+		epai_set_error("Decoding failed:"
+				"section length exceeds total buffer length.");
 		return EPAI_ERROR_SECTION_LENGTH;
 	}
 
@@ -60,6 +63,8 @@ extern epai_error_t epai_decoder_decode(epai_decoder_t* ds) {
 	while (total_len > 0) {
 		sec_len = epai_section_parse_length(sp);
 		if (sec_len > total_len) {
+			epai_set_error("Decoding failed:"
+					"section length exceeds total buffer length.");
 			return EPAI_ERROR_SECTION_LENGTH;
 		}
 
