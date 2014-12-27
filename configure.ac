@@ -1,7 +1,7 @@
 AC_INIT([epai], [0.0.0.0], [tajjada@gmail.com])
 AC_CONFIG_AUX_DIR(config)
 AC_CONFIG_MACRO_DIR([m4])
-AM_INIT_AUTOMAKE([foreign -Wall])
+AM_INIT_AUTOMAKE([foreign subdir-objects -Wall])
 AC_CONFIG_HEADER([config.h])
 
 AC_SUBST([includedir], [${includedir}/${PACKAGE}])

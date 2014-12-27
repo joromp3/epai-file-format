@@ -9,11 +9,11 @@
 #include "types.h"
 #include "error.h"
 
-#include "file_signature.h"
-#include "padding.h"
-#include "metadata.h"
-#include "generic_section.h"
+#include "sectiontypes/file_signature.h"
+#include "sectiontypes/padding.h"
+#include "sectiontypes/metadata.h"
 #include "checksum.h"
+#include "generic_section.h"
 
 #include "file.h"
 #include "decoder.h"

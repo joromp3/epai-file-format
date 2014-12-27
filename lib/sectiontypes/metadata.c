@@ -13,7 +13,7 @@
 extern int epai_metadata_validate_key_string(const char* key, uint32_t len) {
 	int i;
 
-	for (i = 0; i < len; ++i) {
+	for (i = 0; i < len - 1; ++i) {
 		if (!((key[i] >= 'a' && key[i] <= 'z') ||
 		      (key[i] >= 'A' && key[i] <= 'Z'))) {
 			return 0;
@@ -268,7 +268,7 @@ extern epai_error_t epai_metadata_parse_blob(epai_metadata_section_t** ssp,
 		const epai_byte_t* vp;
 		kl = strlen(buffer);
 		vp = buffer + kl;
-		vl = strlen(buffer);
+		vl = strlen(vp);
 
 		err = epai_metadata_add_pair(*ssp, buffer, vp);
 		if (err != EPAI_SUCCESS) {
