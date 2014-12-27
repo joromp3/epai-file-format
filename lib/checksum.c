@@ -19,12 +19,12 @@ uint32_t epai_crc32(uint32_t crc, const epai_byte_t *buf, size_t len){
 	uint8_t octet;
 	int i, j;
 	const epai_byte_t *p, *q;
-
-	// This check is not thread safe; there is no mutex.
+ 
+	// This check is not thread safe; there is no mutex. 
 	if (have_table == 0) {
-		// Calculate CRC table.
+		// Calculate CRC table. 
 		for (i = 0; i < 256; i++) {
-			rem = i;  // remainder from polynomial division
+			rem = i;  // remainder from polynomial division 
 			for (j = 0; j < 8; j++) {
 				if (rem & 1) {
 					rem >>= 1;
@@ -36,11 +36,11 @@ uint32_t epai_crc32(uint32_t crc, const epai_byte_t *buf, size_t len){
 		}
 		have_table = 1;
 	}
-
+ 
 	crc = ~crc;
 	q = buf + len;
 	for (p = buf; p < q; p++) {
-		octet = *p;  // Cast to unsigned octet.
+		octet = *p;  // Cast to unsigned octet. 
 		crc = (crc >> 8) ^ table[(crc & 0xff) ^ octet];
 	}
 	return ~crc;
@@ -65,15 +65,19 @@ extern epai_error_t epai_checksum_new_struct(epai_checksum_section_t** ssp) {
 
 
 extern epai_error_t epai_checksum_validate_blob(const epai_byte_t* buffer, uint32_t len) {
-	epai_error_t err = epai_validate_optional_section_blob(buffer, len);
+	int i;
 
-	if (err != EPAI_SUCCESS) {
-		return err;
+	epai_error_t error = epai_validate_optional_section_blob(buffer, len);
+
+	if (error) {
+		return error;
 	}
 
 	if (*buffer != EPAI_SECTION_CHECKSUM) {
 		return EPAI_ERROR_SECTION_TYPE;
 	}
+
+
 
 	return EPAI_SUCCESS;
 }
@@ -81,17 +85,18 @@ extern epai_error_t epai_checksum_validate_blob(const epai_byte_t* buffer, uint3
 
 extern epai_error_t epai_checksum_parse_blob(epai_checksum_section_t** ssp,
 		const epai_byte_t* buffer, uint32_t len) {
-	epai_error_t err = epai_checksum_validate_blob(buffer, len);
+	epai_error_t error = epai_checksum_validate_blob(buffer, len);
 
-	if (err != EPAI_SUCCESS) {
-		return err;
+	if (error) {
+		return error;
 	}
 
-	err = epai_checksum_new_struct(ssp);
-	(*ssp)->length = len;
+	error = epai_checksum_new_struct(ssp);
+	(*ssp)->length =*(uint32_t*) buffer+1;
+	(*ssp)->checksum = *(uint32_t*) buffer+5;
 
-	if (err != EPAI_SUCCESS) {
-		return err;
+	if (error) {
+		return error;
 	}
 
 	return EPAI_SUCCESS;
@@ -120,23 +125,28 @@ extern epai_error_t epai_checksum_fill_blob(const epai_checksum_section_t* ssp,
 
 	/* FIXME handle endian */
 	*(uint32_t*) (buffer + 1) = ssp->length - 9;
-
-	uint32_t res=epai_crc32(0,buffer+9,len-9);
-	*(uint32_t*) (buffer + 5) = res;
+	*(uint32_t*) (buffer + 5) = ssp->checksum;	
 
 	return EPAI_SUCCESS;
 }
 
+extern uint32_t epai_checksum_calculate ( epai_checksum_section_t* ssp, epai_byte_t *buffer, uint32_t len) {
+	uint32_t res=epai_crc32(0,buffer,len);
+	ssp->checksum=res;
+}
+
+
+
 extern epai_error_t epai_checksum_new_blob(const epai_checksum_section_t* ssp,
 		epai_byte_t** out, uint32_t* len) {
 	epai_byte_t* r = malloc(ssp->length);
-	epai_error_t err;
+	epai_error_t error;
 
 	if (r == NULL) {
-		err = EPAI_ERROR_MALLOC;
+		error = EPAI_ERROR_MALLOC;
 	} else {
-		err = epai_checksum_fill_blob(ssp, r, ssp->length);
-		if (err == EPAI_SUCCESS) {
+		error = epai_checksum_fill_blob(ssp, r, ssp->length);
+		if (error == EPAI_SUCCESS) {
 			*out = r;
 			*len = ssp->length;
 		} else {
@@ -144,5 +154,5 @@ extern epai_error_t epai_checksum_new_blob(const epai_checksum_section_t* ssp,
 		}
 	}
 
-	return err;
+	return error;
 }
