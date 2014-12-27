@@ -1,8 +1,8 @@
 This directory contains some basic sample files to use for testing.
 
 unc.epai:
-	A file containing a simple static image with pixel format A1R4G4B4,
-	with some padding and text metadata. The image is uncompressed
+	A valid file containing a simple static image with pixel format
+	A1R4G4B4, with padding and text metadata. The image is uncompressed
 	(algorithm "COPY") and unfiltered (filter 0x00 on all scanlines).
 unc-nopadd.epai:
 	Same, without the padding.
@@ -11,4 +11,7 @@ unc-stripped.epai:
 paddonly.epai:
 	A file containing only padding. Invalid (no images) but useful for
 	testing.
+metadata-test.epai:
+	A file containing just a valid metadata section and some padding.
+	File invalid (no images) but useful for preliminary testing.
 
