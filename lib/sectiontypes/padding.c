@@ -6,8 +6,8 @@
  */
 
 
-#include "common.h"
-#include "epai.h"
+#include "../common.h"
+#include "../epai.h"
 
 
 extern void epai_padding_free_struct(epai_padding_section_t* ssp) {

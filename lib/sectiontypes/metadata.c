@@ -6,8 +6,8 @@
  */
 
 
-#include "common.h"
-#include "epai.h"
+#include "../common.h"
+#include "../epai.h"
 
 
 extern int epai_metadata_validate_key_string(const char* key, uint32_t len) {
