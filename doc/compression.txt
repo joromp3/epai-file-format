@@ -1,0 +1,51 @@
+# Compression Algorithms for Animated Images -- Specification
+
+Author: Georgi Maldzhanov
+Date: December 2014
+
+## Introduction
+
+Image compression is focused  for pixels, not for the bytes like normal
+lossless compression algorithms. For example if we have 24-bit RGB image
+, then we have to match all 3 bytes in uncompressed stream, then this match
+is replaced with only one byte with offset from current position in the 
+stream. We have now saved two bytes from stream size, one byte offset==3 
+bytes pixel. Maximum offset for one byte is 255*3, where 3 is size of the
+One 24-bit pixel.
+
+## Simple offset compression
+
+Idea for this compression is to remove duplicated pixels from uncompressed
+stream, and to encode this match with one byte offset. If we have 32 bit
+RGBA image, then if we find in last 255*4 processed pixels a match for
+curretly processed pixel, then we replace this pixel with offset of that 
+match. If we can't find that match, we record number 0 to mark a pixels that
+is not found in last 255 pixels, and pixel itself is recorded after that zero
+byte. In hard to compress data like images, we don't see too often a pixel
+match, so we will have many zero bytes in the compressed stream. To remove 
+some zeros, we can encode multiple pixels without match, with numbers from 0 to
+10 for example, so this number is the length of non matching pixels, after
+the last matched pixel. Whit this fast forward technique we can save more
+bytes.
+Offset length of one byte is chosen that the speed of decompression is fastest
+as possible, and with CPU with unaligned memory access, this will be a best bet.
+We don't match series of pixels , with standard offset/length pair, because
+of added complexity and size, and to keep the code small and fast.
+
+## Simple dictionary compression
+
+If we use the idea for simple offset compression, and change offset byte to 
+pointer to some dictionary with pixel values or series of pixel values. That 
+we can easily add multiple pixels match, without adding length part, because
+we can build the dictionary with pixels with length 1 or 10 or more.
+So main complexity here is to build useful dictionary. We can build dictionary,
+after scanning the whole image and use this dictionary without modifications, then
+we will record this dictionary with image to decompress it latter. But we can
+setup some dictionary at start, then modify it on the move, as we compress the
+image, then we decompress it and build the dictionary same way.
+Main time consuming task would be dictionary building on the fly, or prebuild, so 
+there will be different methods to achieve this task. 
+
+## Methods for building dictionary
+ 
+TODO
