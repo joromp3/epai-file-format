@@ -133,6 +133,11 @@ extern epai_error_t epai_metadata_add_pair(epai_metadata_section_t* ssp,
 				"key too long.");
 		return EPAI_ERROR_METADATA_LIMITS;
 	}
+	if (keylen == 0) {
+		epai_set_error("Could not add new metadata pair: "
+				"key is empty.");
+		return EPAI_ERROR_METADATA_KEY;
+	}
 	if (vallen > EPAI_METADATA_VAL_LEN) {
 		epai_set_error("Could not add new metadata pair: "
 				"value too long.");
