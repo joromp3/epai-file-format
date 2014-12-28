@@ -62,8 +62,13 @@ extern epai_error_t epai_decoder_decode(epai_decoder_t* ds) {
 
 	while (total_len > 0) {
 		sec_len = epai_section_parse_length(sp);
+		if (sec_len == 0) {
+			epai_set_error("Decoding failed: "
+					"unsupported mandatory section type.");
+			return EPAI_ERROR_SECTION_TYPE;
+		}
 		if (sec_len > total_len) {
-			epai_set_error("Decoding failed:"
+			epai_set_error("Decoding failed: "
 					"section length exceeds total buffer length.");
 			return EPAI_ERROR_SECTION_LENGTH;
 		}
