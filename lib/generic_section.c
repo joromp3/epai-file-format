@@ -161,7 +161,7 @@ extern uint32_t epai_section_parse_length(const epai_byte_t* buffer) {
 		return epai_metadata_parse_length(buffer);
 	default:
 		if (*buffer & 0x80) {
-			return -1;
+			return 0;
 		} else {
 			return epai_optional_section_parse_length(buffer);
 		}
@@ -178,7 +178,7 @@ extern uint32_t epai_section_encode_length(const epai_section_t* ssp) {
 		return epai_metadata_encode_length(ssp);
 	default:
 		if (ssp->type & 0x80) {
-			return -1;
+			return 0;
 		} else {
 			return epai_optional_section_encode_length(ssp);
 		}

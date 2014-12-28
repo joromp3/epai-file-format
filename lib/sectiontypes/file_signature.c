@@ -6,8 +6,8 @@
  */
 
 
-#include "common.h"
-#include "epai.h"
+#include "../common.h"
+#include "../epai.h"
 
 
 /* According to spec, all file signatures must be of exactly this length. */
