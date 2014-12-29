@@ -267,6 +267,9 @@ extern epai_error_t epai_metadata_parse_blob(epai_metadata_section_t** ssp,
 	}
 
 	err = epai_metadata_new_struct(&ns);
+	if (err != EPAI_SUCCESS) {
+		return err;
+	}
 
 	buffer += 5;
 	len -= 5;

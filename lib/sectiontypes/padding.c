@@ -66,11 +66,11 @@ extern epai_error_t epai_padding_parse_blob(epai_padding_section_t** ssp,
 	}
 
 	err = epai_padding_new_struct(&ns);
-	ns->length = len;
-
 	if (err != EPAI_SUCCESS) {
 		return err;
 	}
+
+	ns->length = len;
 
 	*ssp = ns;
 
