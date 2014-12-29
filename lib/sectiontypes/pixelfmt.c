@@ -58,7 +58,7 @@ extern epai_error_t epai_pixelfmt_validate_blob(const epai_byte_t* buffer, uint3
 }
 
 extern epai_error_t epai_pixelfmt_parse_blob(epai_pixelfmt_section_t** ssp,
-		const epai_byte_t* buffer, uint32_t len) {
+		epai_file_t* file, const epai_byte_t* buffer, uint32_t len) {
 	epai_error_t err = epai_pixelfmt_validate_blob(buffer, len);
 	epai_pixelfmt_section_t* ns;
 	int i;
@@ -84,7 +84,8 @@ extern epai_error_t epai_pixelfmt_parse_blob(epai_pixelfmt_section_t** ssp,
 	return EPAI_SUCCESS;
 }
 
-extern uint32_t epai_pixelfmt_parse_length(const epai_byte_t* buffer) {
+extern uint32_t epai_pixelfmt_parse_length(const epai_file_t* file,
+		const epai_byte_t* buffer) {
 	return *(buffer + 1) + 2;
 }
 
@@ -93,7 +94,7 @@ extern uint32_t epai_pixelfmt_encode_length(const epai_pixelfmt_section_t* ssp) 
 }
 
 extern epai_error_t epai_pixelfmt_fill_blob(const epai_pixelfmt_section_t* ssp,
-		epai_byte_t* buffer, uint32_t len) {
+		const epai_file_t* file, epai_byte_t* buffer, uint32_t len) {
 	int i;
 
 	if (ssp->nchannels == 0) {
@@ -119,7 +120,7 @@ extern epai_error_t epai_pixelfmt_fill_blob(const epai_pixelfmt_section_t* ssp,
 }
 
 extern epai_error_t epai_pixelfmt_new_blob(const epai_pixelfmt_section_t* ssp,
-		  epai_byte_t** out, uint32_t* len) {
+		  const epai_file_t* file, epai_byte_t** out, uint32_t* len) {
 	epai_byte_t* r = malloc(ssp->nchannels + 2);
 	epai_error_t err;
 
@@ -127,7 +128,7 @@ extern epai_error_t epai_pixelfmt_new_blob(const epai_pixelfmt_section_t* ssp,
 		epai_set_error("Could not allocate memory for new pixelfmt blob.");
 		err = EPAI_ERROR_MALLOC;
 	} else {
-		err = epai_pixelfmt_fill_blob(ssp, r, ssp->nchannels + 2);
+		err = epai_pixelfmt_fill_blob(ssp, file, r, ssp->nchannels + 2);
 		if (err == EPAI_SUCCESS) {
 			*out = r;
 			*len = ssp->nchannels + 2;

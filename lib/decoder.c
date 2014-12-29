@@ -22,7 +22,7 @@ extern epai_error_t epai_decoder_new_from_ptr(epai_decoder_t** ds,
 		return EPAI_ERROR_MALLOC;
 	}
 
-	err = epai_file_new(&ns->file, EPAI_ENDIAN_LITTLE);
+	err = epai_file_new(&ns->file, EPAI_ENDIAN_NATIVE);
 	if (err != EPAI_SUCCESS) {
 		free(ns);
 		return err;
@@ -42,7 +42,7 @@ extern epai_error_t epai_decoder_decode(epai_decoder_t* ds) {
 	const epai_byte_t *sp = ds->ptr_in;
 	epai_section_t* sec;
 
-	sec_len = epai_file_signature_parse_length(sp);
+	sec_len = epai_file_signature_parse_length(ds->file, sp);
 	if (sec_len > total_len) {
 		epai_set_error("Decoding failed:"
 				"section length exceeds total buffer length.");
@@ -51,7 +51,7 @@ extern epai_error_t epai_decoder_decode(epai_decoder_t* ds) {
 
 	epai_file_signature_free_struct(ds->file->sections[0]);
 	err = epai_file_signature_parse_blob(&ds->file->sections[0],
-			sp, sec_len);
+			ds->file, sp, sec_len);
 
 	if (err != EPAI_SUCCESS) {
 		return err;
@@ -61,7 +61,7 @@ extern epai_error_t epai_decoder_decode(epai_decoder_t* ds) {
 	total_len -= sec_len;
 
 	while (total_len > 0) {
-		sec_len = epai_section_parse_length(sp);
+		sec_len = epai_section_parse_length(ds->file, sp);
 		if (sec_len == 0) {
 			epai_set_error("Decoding failed: "
 					"unsupported mandatory section type.");
@@ -73,7 +73,7 @@ extern epai_error_t epai_decoder_decode(epai_decoder_t* ds) {
 			return EPAI_ERROR_SECTION_LENGTH;
 		}
 
-		err = epai_section_parse_blob(&sec, sp, sec_len);
+		err = epai_section_parse_blob(&sec, ds->file, sp, sec_len);
 		if (err != EPAI_SUCCESS) {
 			return err;
 		}

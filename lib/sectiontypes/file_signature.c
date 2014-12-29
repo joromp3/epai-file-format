@@ -78,9 +78,10 @@ extern epai_error_t epai_file_signature_validate_blob(const epai_byte_t* buffer,
 
 
 extern epai_error_t epai_file_signature_parse_blob(epai_fsign_section_t** ssp,
-		const epai_byte_t* buffer, uint32_t len) {
+		epai_file_t* file, const epai_byte_t* buffer, uint32_t len) {
 	epai_error_t err = epai_file_signature_validate_blob(buffer, len);
 	epai_fsign_section_t* ns;
+	uint16_t em;
 
 	if (err != EPAI_SUCCESS) {
 		return err;
@@ -92,13 +93,28 @@ extern epai_error_t epai_file_signature_parse_blob(epai_fsign_section_t** ssp,
 		return err;
 	}
 
+	em = le16toh(*(buffer+9) << 8 | *(buffer+10));
+
+	switch (em) {
+	case 0xAF00:
+		file->endian = EPAI_ENDIAN_BIG;
+		break;
+	case 0x00AF:
+		file->endian = EPAI_ENDIAN_LITTLE;
+		break;
+	default:
+		epai_set_error("Failed to parse file signature: bad endian marker.");
+		return EPAI_ERROR_BAD_FILE_SIGNATURE;
+	}
+
 	*ssp = ns;
 
 	return EPAI_SUCCESS;
 }
 
 
-extern uint32_t epai_file_signature_parse_length(const epai_byte_t* buffer) {
+extern uint32_t epai_file_signature_parse_length(const epai_file_t* file,
+		const epai_byte_t* buffer) {
 	return file_signature_header_len;
 }
 
@@ -108,7 +124,7 @@ extern uint32_t epai_file_signature_encode_length(const epai_fsign_section_t* ss
 
 
 extern epai_error_t epai_file_signature_fill_blob(const epai_fsign_section_t* ssp,
-		epai_byte_t* buffer, uint32_t len) {
+		const epai_file_t* file, epai_byte_t* buffer, uint32_t len) {
 
 	if (len < file_signature_header_len) {
 		epai_set_error("Could not fill buffer with file signature blob: "
@@ -124,16 +140,27 @@ extern epai_error_t epai_file_signature_fill_blob(const epai_fsign_section_t* ss
 	*++buffer = 0x0D;
 	*++buffer = 0x0A;
 	*++buffer = 0x0A;
-	*++buffer = 0x00; /* TODO: get a version value from global state. */
-	/* FIXME: detect and set the correct endian marker. */
-	*++buffer = 0x00;
-	*++buffer = 0xAF;
+	*++buffer = file->version;
+
+	switch (file->endian) {
+	case EPAI_ENDIAN_NATIVE:
+		*((uint16_t*)(++buffer)) = 0xAF00;
+		break;
+	case EPAI_ENDIAN_LITTLE:
+		*++buffer = 0x00;
+		*++buffer = 0xAF;
+		break;
+	case EPAI_ENDIAN_BIG:
+		*++buffer = 0xAF;
+		*++buffer = 0x00;
+		break;
+	}
 
 	return EPAI_SUCCESS;
 }
 
 extern epai_error_t epai_file_signature_new_blob(const epai_fsign_section_t* ssp,
-		epai_byte_t** out, uint32_t* len) {
+		const epai_file_t* file, epai_byte_t** out, uint32_t* len) {
 	epai_byte_t* r = malloc(file_signature_header_len);
 	epai_error_t err;
 
@@ -141,7 +168,7 @@ extern epai_error_t epai_file_signature_new_blob(const epai_fsign_section_t* ssp
 		epai_set_error("Could not allocate memory for new file signature blob.");
 		err = EPAI_ERROR_MALLOC;
 	} else {
-		err = epai_file_signature_fill_blob(ssp, r,
+		err = epai_file_signature_fill_blob(ssp, file, r,
 				file_signature_header_len);
 		if (err == EPAI_SUCCESS) {
 			*out = r;

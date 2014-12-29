@@ -7,6 +7,16 @@
 #define EPAI_FILE_H
 
 
+/* to be used for byte buffers; text strings should use regular char type */
+typedef unsigned char epai_byte_t;
+
+
+typedef enum {
+	EPAI_ENDIAN_NATIVE,
+	EPAI_ENDIAN_LITTLE,
+	EPAI_ENDIAN_BIG
+} epai_endian_t;
+
 typedef struct {
 	epai_endian_t endian;
 	int version;
