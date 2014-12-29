@@ -259,13 +259,14 @@ extern epai_error_t epai_metadata_validate_blob(const epai_byte_t* buffer,
 extern epai_error_t epai_metadata_parse_blob(epai_metadata_section_t** ssp,
 		const epai_byte_t* buffer, uint32_t len) {
 	epai_error_t err = epai_metadata_validate_blob(buffer, len);
+	epai_metadata_section_t* ns;
 	int kl, vl;
 
 	if (err != EPAI_SUCCESS) {
 		return err;
 	}
 
-	err = epai_metadata_new_struct(ssp);
+	err = epai_metadata_new_struct(&ns);
 
 	buffer += 5;
 	len -= 5;
@@ -275,15 +276,17 @@ extern epai_error_t epai_metadata_parse_blob(epai_metadata_section_t** ssp,
 		vp = buffer + kl + 1;
 		vl = strlen(vp);
 
-		err = epai_metadata_add_pair(*ssp, buffer, vp);
+		err = epai_metadata_add_pair(ns, buffer, vp);
 		if (err != EPAI_SUCCESS) {
-			epai_metadata_free_struct(*ssp);
+			epai_metadata_free_struct(ns);
 			return err;
 		}
 
 		buffer = vp + vl + 1;
 		len -= kl + vl + 2;
 	}
+
+	*ssp = ns;
 
 	return EPAI_SUCCESS;
 }

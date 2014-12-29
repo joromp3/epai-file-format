@@ -1,6 +1,7 @@
 /* See LICENSE file for copyright and license terms. */
 
-/* decoder.h: header for matadata.c */
+/* metadata.h: header for metadata.c */
+
 
 #ifndef LIBEPAI_METADATA_H
 #define LIBEPAI_METADATA_H
@@ -22,7 +23,7 @@ typedef struct {
 } epai_metadata_section_t;
 
 
-/* check if all epai_byte_tacters in a string are valid for a metadata key */
+/* check if all characters in a string are valid for a metadata key */
 extern int epai_metadata_validate_key_string(const char*, uint32_t);
 
 /* free/destroy a metadata struct */

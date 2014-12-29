@@ -15,14 +15,16 @@ extern void epai_padding_free_struct(epai_padding_section_t* ssp) {
 }
 
 extern epai_error_t epai_padding_new_struct(epai_padding_section_t** ssp) {
-	*ssp = malloc(sizeof(**ssp));
-	if (*ssp == NULL) {
+	epai_padding_section_t* ns = malloc(sizeof(*ns));
+	if (ns == NULL) {
 		epai_set_error("Could not allocate memory for new padding struct.");
 		return EPAI_ERROR_MALLOC;
 	}
 
-	(*ssp)->type = EPAI_SECTION_PADDING;
-	(*ssp)->length = 5;
+	ns->type = EPAI_SECTION_PADDING;
+	ns->length = 5;
+
+	*ssp = ns;
 
 	return EPAI_SUCCESS;
 }
@@ -57,17 +59,20 @@ extern epai_error_t epai_padding_validate_blob(const epai_byte_t* buffer, uint32
 extern epai_error_t epai_padding_parse_blob(epai_padding_section_t** ssp,
 		const epai_byte_t* buffer, uint32_t len) {
 	epai_error_t err = epai_padding_validate_blob(buffer, len);
+	epai_padding_section_t* ns;
 
 	if (err != EPAI_SUCCESS) {
 		return err;
 	}
 
-	err = epai_padding_new_struct(ssp);
-	(*ssp)->length = len;
+	err = epai_padding_new_struct(&ns);
+	ns->length = len;
 
 	if (err != EPAI_SUCCESS) {
 		return err;
 	}
+
+	*ssp = ns;
 
 	return EPAI_SUCCESS;
 }

@@ -23,13 +23,15 @@ extern void epai_file_signature_free_struct(epai_fsign_section_t* ssp) {
 }
 
 extern epai_error_t epai_file_signature_new_struct(epai_fsign_section_t** ssp) {
-	*ssp = malloc(sizeof(**ssp));
-	if (*ssp == NULL) {
+	epai_fsign_section_t* ns = malloc(sizeof(**ssp));
+	if (ns == NULL) {
 		epai_set_error("Could not allocate memory for new file signature struct.");
 		return EPAI_ERROR_MALLOC;
 	}
 
-	(*ssp)->type = EPAI_SECTION_FILE_SIGNATURE;
+	ns->type = EPAI_SECTION_FILE_SIGNATURE;
+
+	*ssp = ns;
 
 	return EPAI_SUCCESS;
 }
@@ -78,16 +80,19 @@ extern epai_error_t epai_file_signature_validate_blob(const epai_byte_t* buffer,
 extern epai_error_t epai_file_signature_parse_blob(epai_fsign_section_t** ssp,
 		const epai_byte_t* buffer, uint32_t len) {
 	epai_error_t err = epai_file_signature_validate_blob(buffer, len);
+	epai_fsign_section_t* ns;
 
 	if (err != EPAI_SUCCESS) {
 		return err;
 	}
 
-	err = epai_file_signature_new_struct(ssp);
+	err = epai_file_signature_new_struct(&ns);
 
 	if (err != EPAI_SUCCESS) {
 		return err;
 	}
+
+	*ssp = ns;
 
 	return EPAI_SUCCESS;
 }
