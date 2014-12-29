@@ -18,6 +18,7 @@ typedef union {
 	epai_optional_section_t opt;
 	epai_padding_section_t padding;
 	epai_metadata_section_t metadata;
+	epai_pixelfmt_section_t pixelfmt;
 } epai_section_t;
 
 
