@@ -19,6 +19,8 @@ libepai_la_SOURCES = epai.h \
 		     sectiontypes/padding.c \
 		     sectiontypes/metadata.h \
 		     sectiontypes/metadata.c \
+		     sectiontypes/pixelfmt.h \
+		     sectiontypes/pixelfmt.c \
 		     checksum.h \
 		     checksum.c
 
@@ -33,4 +35,5 @@ include_HEADERS = epai.h \
 		  sectiontypes/file_signature.h \
 		  sectiontypes/padding.h \
 		  sectiontypes/metadata.h \
+		  sectiontypes/pixelfmt.h \
 		  checksum.h

@@ -59,6 +59,9 @@ extern epai_error_t epai_section_free_struct(epai_section_t* ssp) {
 	case EPAI_SECTION_METADATA:
 		epai_metadata_free_struct(ssp);
 		break;
+	case EPAI_SECTION_PIXELFMT:
+		epai_pixelfmt_free_struct(ssp);
+		break;
 	default:
 		epai_set_error("Failed to dispatch section free:"
 				"unknown section type.");
@@ -77,6 +80,8 @@ extern epai_error_t epai_section_new_struct(epai_section_t** ssp,
 		return epai_padding_new_struct(ssp);
 	case EPAI_SECTION_METADATA:
 		return epai_metadata_new_struct(ssp);
+	case EPAI_SECTION_PIXELFMT:
+		return epai_pixelfmt_new_struct(ssp);
 	default:
 		epai_set_error("Failed to dispatch section allocation:"
 				"unknown section type.");
@@ -92,6 +97,8 @@ extern epai_error_t epai_section_validate_blob(const epai_byte_t* buffer, uint32
 		return epai_padding_validate_blob(buffer, len);
 	case EPAI_SECTION_METADATA:
 		return epai_metadata_validate_blob(buffer, len);
+	case EPAI_SECTION_PIXELFMT:
+		return epai_pixelfmt_validate_blob(buffer, len);
 	default:
 		if (*buffer & 0x80) {
 			epai_set_error("Failed to dispatch section blob validation:"
@@ -112,6 +119,8 @@ extern epai_error_t epai_section_parse_blob(epai_section_t** ssp,
 		return epai_padding_parse_blob(ssp, buffer, len);
 	case EPAI_SECTION_METADATA:
 		return epai_metadata_parse_blob(ssp, buffer, len);
+	case EPAI_SECTION_PIXELFMT:
+		return epai_pixelfmt_parse_blob(ssp, buffer, len);
 	default:
 		epai_set_error("Failed to dispatch section parse:"
 				"unknown section type.");
@@ -128,6 +137,8 @@ extern epai_error_t epai_section_fill_blob(const epai_section_t* ssp,
 		return epai_padding_fill_blob(ssp, buffer, len);
 	case EPAI_SECTION_METADATA:
 		return epai_metadata_fill_blob(ssp, buffer, len);
+	case EPAI_SECTION_PIXELFMT:
+		return epai_pixelfmt_fill_blob(ssp, buffer, len);
 	default:
 		epai_set_error("Failed to dispatch section blob fill:"
 				"unknown section type.");
@@ -144,6 +155,8 @@ extern epai_error_t epai_section_new_blob(const epai_section_t* ssp,
 		return epai_padding_new_blob(ssp, buffer, len);
 	case EPAI_SECTION_METADATA:
 		return epai_metadata_new_blob(ssp, buffer, len);
+	case EPAI_SECTION_PIXELFMT:
+		return epai_pixelfmt_new_blob(ssp, buffer, len);
 	default:
 		epai_set_error("Failed to dispatch section blob allocation:"
 				"unknown section type.");
@@ -159,6 +172,8 @@ extern uint32_t epai_section_parse_length(const epai_byte_t* buffer) {
 		return epai_padding_parse_length(buffer);
 	case EPAI_SECTION_METADATA:
 		return epai_metadata_parse_length(buffer);
+	case EPAI_SECTION_PIXELFMT:
+		return epai_pixelfmt_parse_length(buffer);
 	default:
 		if (*buffer & 0x80) {
 			return 0;
@@ -176,6 +191,8 @@ extern uint32_t epai_section_encode_length(const epai_section_t* ssp) {
 		return epai_padding_encode_length(ssp);
 	case EPAI_SECTION_METADATA:
 		return epai_metadata_encode_length(ssp);
+	case EPAI_SECTION_PIXELFMT:
+		return epai_pixelfmt_encode_length(ssp);
 	default:
 		if (ssp->type & 0x80) {
 			return 0;
