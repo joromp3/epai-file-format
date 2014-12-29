@@ -41,7 +41,7 @@ extern epai_error_t epai_pixelfmt_new_struct(epai_pixelfmt_section_t** ssp) {
 extern epai_error_t epai_pixelfmt_validate_blob(const epai_byte_t* buffer, uint32_t len) {
 	int nchannels;
 
-	if (*buffer != EPAI_SECTION_METADATA) {
+	if (*buffer != EPAI_SECTION_PIXELFMT) {
 		epai_set_error("Could not validate section blob: "
 				"section type code byte is not Pixel Format.");
 		return EPAI_ERROR_SECTION_TYPE;
