@@ -20,7 +20,7 @@ extern epai_error_t epai_encoder_new(epai_encoder_t** es, epai_file_t* f) {
 	epai_error_t err;
 
 	if (f == NULL) {
-		err = epai_file_new(&nf, EPAI_ENDIAN_LITTLE);
+		err = epai_file_new(&nf, EPAI_ENDIAN_NATIVE);
 		if (err != EPAI_SUCCESS) {
 			return err;
 		}
@@ -65,7 +65,7 @@ extern epai_error_t epai_encoder_encode_to_ptr(const epai_decoder_t* es,
 	for (i = 0; i < es->file->num_sections; ++i) {
 		uint32_t slen = epai_section_encode_length(es->file->sections[i]);
 
-		err = epai_section_fill_blob(es->file->sections[i], cp, slen);
+		err = epai_section_fill_blob(es->file->sections[i], es->file, cp, slen);
 		if (err != EPAI_SUCCESS) {
 			free(aout);
 			return err;

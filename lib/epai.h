@@ -6,16 +6,19 @@
 #define LIBEPAI_EPAI_H
 
 
-#include "types.h"
 #include "error.h"
+
+#include "sectiontypes/sectiontypes.h"
+#include "file.h"
 
 #include "sectiontypes/file_signature.h"
 #include "sectiontypes/padding.h"
 #include "sectiontypes/metadata.h"
+#include "sectiontypes/pixelfmt.h"
 #include "checksum.h"
+
 #include "generic_section.h"
 
-#include "file.h"
 #include "decoder.h"
 #include "encoder.h"
 

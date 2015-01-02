@@ -59,6 +59,8 @@ extern epai_error_t epai_file_add_section(epai_file_t* efp, epai_section_t* ssp)
 		return EPAI_ERROR_MALLOC;
 	}
 
+	efp->sections = tmp;
+
 	efp->sections[efp->num_sections] = ssp;
 	++efp->num_sections;
 

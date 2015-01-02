@@ -15,14 +15,16 @@ extern void epai_padding_free_struct(epai_padding_section_t* ssp) {
 }
 
 extern epai_error_t epai_padding_new_struct(epai_padding_section_t** ssp) {
-	*ssp = malloc(sizeof(**ssp));
-	if (*ssp == NULL) {
+	epai_padding_section_t* ns = malloc(sizeof(*ns));
+	if (ns == NULL) {
 		epai_set_error("Could not allocate memory for new padding struct.");
 		return EPAI_ERROR_MALLOC;
 	}
 
-	(*ssp)->type = EPAI_SECTION_PADDING;
-	(*ssp)->length = 5;
+	ns->type = EPAI_SECTION_PADDING;
+	ns->length = 5;
+
+	*ssp = ns;
 
 	return EPAI_SUCCESS;
 }
@@ -55,27 +57,37 @@ extern epai_error_t epai_padding_validate_blob(const epai_byte_t* buffer, uint32
 
 
 extern epai_error_t epai_padding_parse_blob(epai_padding_section_t** ssp,
-		const epai_byte_t* buffer, uint32_t len) {
+		epai_file_t* file, const epai_byte_t* buffer, uint32_t len) {
 	epai_error_t err = epai_padding_validate_blob(buffer, len);
+	epai_padding_section_t* ns;
 
 	if (err != EPAI_SUCCESS) {
 		return err;
 	}
 
-	err = epai_padding_new_struct(ssp);
-	(*ssp)->length = len;
-
+	err = epai_padding_new_struct(&ns);
 	if (err != EPAI_SUCCESS) {
 		return err;
 	}
+
+	ns->length = len;
+
+	*ssp = ns;
 
 	return EPAI_SUCCESS;
 }
 
 
-extern uint32_t epai_padding_parse_length(const epai_byte_t* buffer) {
-	/* FIXME endian */
-	return *(uint32_t*)(buffer + 1) + 5;
+extern uint32_t epai_padding_parse_length(const epai_file_t* file,
+		const epai_byte_t* buffer) {
+	switch (file->endian) {
+	case EPAI_ENDIAN_LITTLE:
+		return le32toh(*(uint32_t*)(buffer + 1) + 5);
+	case EPAI_ENDIAN_BIG:
+		return be32toh(*(uint32_t*)(buffer + 1) + 5);
+	default:
+		return *(uint32_t*)(buffer + 1) + 5;
+	}
 }
 
 extern uint32_t epai_padding_encode_length(const epai_padding_section_t* ssp) {
@@ -84,7 +96,7 @@ extern uint32_t epai_padding_encode_length(const epai_padding_section_t* ssp) {
 
 
 extern epai_error_t epai_padding_fill_blob(const epai_padding_section_t* ssp,
-		epai_byte_t* buffer, uint32_t len) {
+		const epai_file_t* file, epai_byte_t* buffer, uint32_t len) {
 	int i;
 
 	if (ssp->length < 5 || len != ssp->length) {
@@ -100,8 +112,17 @@ extern epai_error_t epai_padding_fill_blob(const epai_padding_section_t* ssp,
 
 	*buffer = EPAI_SECTION_PADDING;
 
-	/* FIXME handle endian */
-	*(uint32_t*) (buffer + 1) = ssp->length - 5;
+	switch (file->endian) {
+	case EPAI_ENDIAN_NATIVE:
+		*(uint32_t*) (buffer + 1) = ssp->length - 5;
+		break;
+	case EPAI_ENDIAN_LITTLE:
+		*(uint32_t*) (buffer + 1) = htole32(ssp->length - 5);
+		break;
+	case EPAI_ENDIAN_BIG:
+		*(uint32_t*) (buffer + 1) = htobe32(ssp->length - 5);
+		break;
+	}
 
 	for (i = 5; i < ssp->length; ++i) {
 		buffer[i] = 0;
@@ -111,7 +132,7 @@ extern epai_error_t epai_padding_fill_blob(const epai_padding_section_t* ssp,
 }
 
 extern epai_error_t epai_padding_new_blob(const epai_padding_section_t* ssp,
-		epai_byte_t** out, uint32_t* len) {
+		const epai_file_t* file, epai_byte_t** out, uint32_t* len) {
 	epai_byte_t* r = malloc(ssp->length);
 	epai_error_t err;
 
@@ -119,7 +140,7 @@ extern epai_error_t epai_padding_new_blob(const epai_padding_section_t* ssp,
 		epai_set_error("Could not allocate memory for new padding blob.");
 		err = EPAI_ERROR_MALLOC;
 	} else {
-		err = epai_padding_fill_blob(ssp, r, ssp->length);
+		err = epai_padding_fill_blob(ssp, file, r, ssp->length);
 		if (err == EPAI_SUCCESS) {
 			*out = r;
 			*len = ssp->length;
